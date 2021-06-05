@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+ {% load static %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+{% csrf_token %}
+<script>
+const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#del").click(function() {
+            if (!confirm("Do you want to delete")){
+      return false;
+}
+else
+{
+const request = new Request(
+   '/delete',
+    {headers: {'X-CSRFToken': csrftoken}}
+);
+
+ return fetch(request, {
+        method: 'DELETE',
+        body: {"country": "iran"},
+    }).then(response => response.text())
+}
+})
+
+    })
+
+</script>
+
+<script>
+jQuery(document).on( "keydown", ".normal", function(e){if (e.keyCode == 13) {return false;} });
+</script>
+<script src="http://bootstrap-tagsinput.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script> 
+  	<title>Sidebar 09</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="http://bootstrap-tagsinput.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.css">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="stylesheet" href="{% static 'sidebar-09/css/style.css' %}">
+
+<style>
+.label-info {
+    background-color: #5bc0de;
+}
+.label {
+    display: inline;
+    padding: .2em .6em .3em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
+
+element.style {
+}
+.bootstrap-tagsinput .tag {
+    margin-right: 2px;
+    color: white;
+}
+.label-info {
+    background-color: #5bc0de;
+}
+
+#postform {
+display: inline-grid;
+}
+select {
+  text-align-last: center;
+  width: fit-content;
+}
+
+.bootstrap-tagsinput{
+width: 30%;
+min-width: 100px;
+padding: 5px 8px;
+
+}
+
+select {
+  width: fit-content;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+
+}
+
+input[type=text].normal {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+h1, h2, h3{
+margin-left: auto;
+margin-right: auto;
+}
+
+input[type=submit].normal{
+  width: 100%;
+  background-color: #04AA6D;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+
+input{box-sizing:border-box} 
+div{box-sizing:border-box} 
+
+.submit_button {
+background-color: darkgreen;
+min-height: 45px;
+}
+
+form{
+margin-left:auto;
+margin-right:auto;
+color: black;
+}
+/* Add a background color to the submit button on mouse-over */
+input[type=submit]:hover {
+  background-color: #45a049;
+} 
+
+header, main, footer {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+</style>
+</head>
+  <body>
+		
+		<div class="wrapper d-flex align-items-stretch">
+			<nav id="sidebar">
+				<div class="custom-menu">
+				<!--	<button type="button" id="sidebarCollapse" class="btn btn-primary">
+	        </button> -->
+        </div>
+	  		<div class="img bg-wrap text-center py-4" style="background-image: url(images/bg_1.jpg);">
+	  			<div class="user-logo">
+	  				<div class="img" style="background-image: url({% static 'images/rango.jpeg' %});"></div>
+	  				<h3>Rango CMS panel</h3>
+	  			</div>
+	  		</div>
+        <ul class="list-unstyled components mb-5">
+          <li class="active">
+            <a href="/panel"><span class="fa fa-home mr-3"></span> Home</a>
+          </li>
+          <li>
+            <a href="/panel/new_post"><span class="fa fa-pencil mr-3"></span> New Post</a>
+          </li>
+          <li>
+            <a href="/panel/settings"><span class="fa fa-cog mr-3"></span> Settings</a>
+          </li>
+          <li>
+            <a href="#"><span class="fa fa-support mr-3"></span> Support</a>
+          </li>
+          <li>
+            <a href="/sign_out"><span class="fa fa-sign-out mr-3"></span> Sign Out</a>
+          </li>
+        </ul>
+
+    	</nav>
+
+        <!-- Page Content  -->
+      <div id="content" class="p-4 p-md-5 pt-5" name="content">
+    {% if settings %}
+        <h2 class="mb-4">Settings</h2>
+   {% endif %}
+  
+
+{% if settings %}
+
+<ul class="list-group">
+  <li class="list-group-item">Articles</li>
+
+  
+
+  
+{% for a in articles %} 
+  <li class="list-group-item list-group-item-primary">
+<a href = "#"> {{a.title}} </a>
+
+<div style="display:inline-block">
+<button href = "#" style="background-color: green;"> edit </button>
+
+<button id='del'  style="background-color: red;">delete</button>
+<span> status : published </span>
+</div>
+</li>
+{% endfor %}
+
+</ul>
+
+<div style="display:list-items">
+<form id="changeCatForm" action="" method="POST">
+{% csrf_token %}
+
+<h2 style="color:orange;">{{ category_form.errors }}</h2>
+
+{% if success_message %}
+<h2 style="color:green;"> {{ success_message }}  </h2>
+{% endif %}
+
+<ul class="list-group">
+<li class="list-group-item"> Add Category </li>
+
+  <li class="list-group-item list-group-item-secondary">
+<label for="id_name">Name:</label> 
+{{ category_form.name }}
+</li>
+  <li class="list-group-item list-group-item-secondary">
+
+<label for="id_slug">Slug:</label> 
+{{ category_form.slug }}
+
+</li>
+
+<button type="submit" class="btn btn-lg btn-primary btn-block submit"> add category </button>
+</ul>
+</form>
+</div>
+{% endif %}
+
+{% if form %}	
+	<div style="display:list-items">
+{{ form.errors }}
+{{ error }}
+
+<form id="postform" action="" method="POST">
+{% csrf_token %}
+
+<label for="id_title">Title:</label> 
+{{ form.title }}
+<label for="id_slug">Slug:</label> 
+{{ form.slug }}
+<label for="id_content">Content:</label> 
+{{ form.content }}
+<div style="display:inline-block">
+<label for="id_categories">Category:</label> 
+{{ form.categories }}
+<label for="id_new_categories">Or add new category:</label> 
+{{ form.new_categories }}
+
+<button type="submit" class="btn btn-lg btn-primary btn-block submit"> submit </button>
+</form>
+</div>
+
+{% endif %}
+
+
+      </div>
+		</div>
+
+
+
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/popper.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+{%if form %}
+{% load static %}
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+{% endif %}
+  </body>
+</html>

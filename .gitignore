@@ -1,0 +1,8 @@
+.idea/
+venv/
+static_root/
+website/static/
+website/website/__pycache__/
+website/blog/__pycache__/
+website/blog/migrations/
+website/db.sqlite3

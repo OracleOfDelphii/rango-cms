@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% load static %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<!--
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
+-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400"/>
+<link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css"/>
+
+
+<link href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" rel="stylesheet">
+
+
+<!--
+<script src="{% static 'script.js' %}"></script>
+-->
+
+
+<style>
+main, footer {
+
+    margin-left: auto;
+    margin-right: auto;
+}
+header{
+margin-left: auto;
+margin-right: auto;
+
+}
+
+.row {
+
+margin-left: auto;
+margin-right: auto;
+
+}
+body {
+			font-family: "Lato", sans-serif;
+			-webkit-font-smoothing: antialiased;
+
+}
+</style>
+
+    <meta charset="UTF-8">
+    <title>home</title>
+</head>
+<div class="container-fluid">
+<header>
+
+
+<nav class = "navbar navbar-expand-md navbar-dark bg-dark">
+<div class="collapse navbar-collapse">
+<ul class="navbar-nav mr-auto">
+{% for c in categories %}
+
+{% if forloop.first %}
+    <li class="nav-item active"><a class="nav-link" href="category/{{c.slug}}">
+    {{c.name}}
+    </a>
+    </li>
+{% else %}
+<li class="nav-item"><a class="nav-link disabled" href="category/{{c.slug}}">
+    {{c.name}}
+    </a>
+    </li>
+{% endif %}
+
+   {% endfor %}
+   </ul>
+</div>
+</nav>
+</header>
+
+<body>
+<main>
+<div class="row mb-2">
+
+{% for c in articles %}
+<div class="card" style="width: 18rem;">
+  <!-- <img src="..." class="card-img-top" alt="..."> -->
+  <div class="card-body">
+    <h5 class="card-title">{{ c.title }}</h5>
+    {% with ct=c.content|safe %}
+    <p class="card-text">{{ ct|slice:"65"}}...</p>
+    {% endwith %}
+{{ c.author }}
+{% for category in c.categories.all %}
+  {{ category }}
+{% endfor %}
+    <a href="/article/{{c.slug}}" class="btn btn-primary">Continue</a>
+     
+  </div>
+</div>
+{% endfor %}
+
+</div>
+</main>
+
+<footer>
+<span>copyright Phalanthus 2021</span>
+</footer>
+
+</body>
+</div>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+ {% load static %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+jQuery(document).on( "keydown", ".normal", function(e){if (e.keyCode == 13) {return false;} });
+</script>
+
+<script src="http://bootstrap-tagsinput.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script> 
+  	<title>Login to CMS</title>
+    <meta charset="utf-8">
+<link rel="stylesheet" href="http://bootstrap-tagsinput.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.css">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+<link rel="stylesheet" href="/static/sidebar-09/css/style.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+.label-info {
+    background-color: #5bc0de;
+}
+.label {
+    display: inline;
+    padding: .2em .6em .3em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
+.label-info {
+    background-color: #5bc0de;
+}
+select {
+  text-align-last: center;
+  width: fit-content;
+}
+
+
+select {
+  width: fit-content;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+
+}
+
+input[type=text].normal {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+h1, h2, h3{
+margin-left: auto;
+margin-right: auto;
+}
+
+input[type=submit].normal{
+  width: 100%;
+  background-color: #04AA6D;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+
+input{box-sizing:border-box} 
+
+.submit_button {
+background-color: darkgreen;
+min-height: 45px;
+}
+
+form{
+margin-left:auto;
+margin-right:auto;
+}
+/* Add a background color to the submit button on mouse-over */
+input[type=submit]:hover {
+  background-color: #45a049;
+} 
+body {
+background-color:black;
+}
+</style>
+</head>
+
+
+<header>
+<h1 class="display-1"> Panel login </h1>
+                    <h3>Rango CMS panel</h3>
+</div>
+
+</header>
+
+<body>
+<div class="user-logo">
+                    <div class="img" style="background-image: url(/static/images/rango.jpeg);"></div>
+ 
+<div style="display:flex;">
+<form method="POST" action="">
+ <div class="form-group">
+{% csrf_token %}
+{{ form.as_p }}
+
+<button type="submit" class="btn btn-lg btn-primary btn-block submit">login</button>
+</div>
+</form>
+</div>
+</body>
+</html>
