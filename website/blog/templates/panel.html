@@ -23,7 +23,10 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
                     return fetch(request, {
                         method: "DELETE",
-                        body: {"id": event.target.id}, }).then(response => response.text().then(
+                        headers: new Headers({"content-type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+   "X-CSRFToken": csrftoken }),
+                        body: JSON.stringify({"slug": event.target.id}), }).then(response => response.json().then(
                         data =>  ({"status": "200", body: data})))}
                 }
         );

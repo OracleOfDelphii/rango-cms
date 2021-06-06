@@ -55,21 +55,17 @@ import json
 def panel(request):
     if request.get_full_path() == '/delete/':
         if request.is_ajax and request.method == "DELETE":
-            print("successfully deleted")
-            print(request.body)
-        
-        if 'json' in request.headers.get('Content-Type'):
-            js = request.json()
+            if 'json' in request.headers.get('Content-Type'):
+                js = json.loads(request.body)
+                article_slug = js['slug']
+                print(article_slug)
+                Article.objects.get(slug=article_slug).delete()
+                print("successfully deleted")
+
         else:
             print('Response content is not in JSON format.')
-            js = 'spam'
 
-        try: #try parsing to dict
-            dataform = str(request.body).strip("'<>() ").replace('\'', '\"')
-            struct = json.loads(dataform)
-        except:
-            print(request.body)
- 
+    
     if request.get_full_path() == '/panel/settings':
         # just showing categories for now
         
@@ -86,48 +82,45 @@ def panel(request):
         form = CategoryForm()
         return render(request, 'panel.html', {'settings': True, 'category_form': form})
 
-    if request.method == 'POST' and request.POST and request.get_full_path() == '/panel/new_post':
-        form = PostForm(request.POST, request.FILES)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user 
-            form.save()
+    if request.get_full_path() == '/panel/new_post':
+        if request.method == 'POST' and request.POST:
+            form = PostForm(request.POST, request.FILES)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user 
+                form.save()
 
-            try:
-                post.save()
-                form.save_m2m()
-            except Exception as e:
-                print(e)
-                # only for test now, will use django-rest later
-                return render(request, 'panel.html', {'form': form})
-     
-            if form.cleaned_data['new_categories'] != '':
-                for cat in form.cleaned_data['new_categories'].split(','):
-                    new_cat = Category(name=cat, slug = cat)
-                    new_cat.save()
-                    try:
-                        post.save()
-                        article_category = Articles_Categories(category_id = new_cat.id,
+                try:
+                    post.save()
+                    form.save_m2m()
+                except Exception as e:
+                    print(e)
+                    # only for test now, will use django-rest later
+                    return render(request, 'panel.html', {'form': form})
+ 
+                if form.cleaned_data['new_categories'] != '':
+                    for cat in form.cleaned_data['new_categories'].split(','):
+                        new_cat = Category(name=cat, slug = cat)
+                        new_cat.save()
+                        try:
+                            post.save()
+                            article_category = Articles_Categories(category_id = new_cat.id,
                             article_id = post.id)
-                        article_category.save()
-                        print(article_category.category.id, article_category.article.id)
-                        print(new_cat.id)                             
-                    except IntegrityError as e:
-                        err = f"Category: {cat} exists."
-                        # only for test now, will use django-rest later
-                        return render(request, 'panel.html', {'form': form})
+                            article_category.save()
+                            print(article_category.category.id, article_category.article.id)
+                            print(new_cat.id)                             
+                        except IntegrityError as e:
+                            err = f"Category: {cat} exists."
+                            # only for test now, will use django-rest later
+                            return render(request, 'panel.html', {'form': form})
                  
-            return HttpResponseRedirect("/panel/new_post/success", content_type="application/json")
-        else:               
-
+                return HttpResponseRedirect("/panel/new_post/success", content_type="application/json")
+                      
             # only for test now, will use django-rest later
+        else:
+            form = PostForm()
             return render(request, 'panel.html', {'form': form})
-    else:
-        form = PostForm()
-        # only for test now, will use django-rest later
-        print(form)
-
-        return render(request, 'panel.html', {'form': form})
+    return render(request, 'panel.html')
 
 from django.contrib.auth.views import LoginView
 

@@ -16,15 +16,19 @@
 
 
 <style>
-
-
-.cats {
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
-  background-color: black;
-  padding: 0.1em;
-  border-radius: 5px;  
+.container-fluid{
+width: fit-content;
+max-width:50em;
+    margin-right: auto;
+ 
+    margin-left: auto;
 }
 
+.cats {
+    box-shadow: 0px 5px 2px rgb(0 0 0 / 10%);
+    padding: 0.3em;
+    border-radius: 5px;
+}
  
 .cats a {
   font-size: 15px;
@@ -132,11 +136,11 @@ margin: 0 0 0.35em;
 
     <main>
 
-    <div class="row mb-2">
+    <div class="mb-2">
 
     {% if article %}
-    <div class="card" style="width: 18rem;">
-<img src="{{ MEDIA_URL }}/{{article.img}}" class="card-img-top" alt="...">
+    <div class="card" style="font-size: 19px;">
+<img src="{{ MEDIA_URL }}{{article.img}}" width="512px" height="512px" max-width="fit-content" max-height="fit-content" class="card-img-top" alt="{{ article.title }}">
       <div class="card-body">
         <h5 class="card-title">{{ article.title }}</h5>
         <p class="card-text">{{ article.content|safe}}</p>

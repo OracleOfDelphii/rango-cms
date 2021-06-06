@@ -21,13 +21,19 @@
 <style>
 
 .cats {
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
-  background-color: black;
-  padding: 0.3em;
-  border-radius: 5px;  
+    box-shadow: 0px 5px 2px rgb(0 0 0 / 10%);
+    padding: 0.3em;
+    border-radius: 5px;
 }
-
  
+.container-fluid {
+
+width: fit-content;
+    margin-right: auto;
+    background-color: #3d5c76;
+    margin-left: auto;
+
+}
 .cats a {
   font-size: 15px;
   text-decoration: none;
@@ -113,17 +119,20 @@ body {
 <div class="row mb-2">
 
 {% for c in articles %}
-<div class="card" style="width: 18rem;">
-  <!-- <img src="..." class="card-img-top" alt="..."> -->
+<div class="card" style="width: 30rem; font-size: 19px;">
+  <img src="{{MEDIA_URL}}{{c.img}}" class="card-img-top" max-width="fit-content" max-height="fit-content" alt="{{c.title}}">
+ 
   <div class="card-body">
     <h5 class="card-title">{{ c.title }}</h5>
     {% with ct=c.content|safe %}
-    <p class="card-text">{{ ct|slice:"65"}}...</p>
+    <p class="card-text">{{ ct|slice:"500"}}...</p>
     {% endwith %}
 
 
 
-   
+<div style="margin-top:1em; margin-bottom:1em;">
+ <a href="/article/{{c.slug}}" class="btn btn-primary">Continue</a>
+</div>   
 <div class="card-footer">
       <medium class="text-muted">{{ article.author }}</medium>
 <div class="cats">
@@ -131,10 +140,6 @@ body {
     {% for category in c.categories.all %}
   <a href="/category/{{ category.slug }}"><small class="cat text-muted">{{ category.name }}</small></a>
     {% endfor %}
-</div>
-
-<div style="margin-top:1em;">
- <a href="/article/{{c.slug}}" class="btn btn-primary">Continue</a>
 </div>
 
 
