@@ -11,7 +11,7 @@ class Category(models.Model):
         return self.name
 
 
-class Articles_Categories(models.Model):
+class Article_Category(models.Model):
     article = models.ForeignKey('Article', on_delete = models.CASCADE)
     category = models.ForeignKey('Category', on_delete = models.CASCADE)
 
@@ -21,7 +21,7 @@ class Article(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField(max_length=50, unique=True)
     img = models.ImageField(upload_to='articles', default = 'articles/default.jpg')
-    categories = models.ManyToManyField('Category', through='Articles_Categories')
+    categories = models.ManyToManyField('Category', through='Article_Category')
     content = RichTextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 

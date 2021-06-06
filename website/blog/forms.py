@@ -3,7 +3,8 @@ from .models import Article, Category
 from ckeditor.fields import RichTextField
 from django.core.exceptions import ValidationError
 
-class CategoryForm(forms.ModelForm):
+from rest_framework import serializers
+class CategoryForm(serializers.ModelSerializer):
     name = forms.CharField(widget = forms.TextInput(attrs = {'class': 'normal'}),required=True, max_length=100) 
     slug = forms.CharField(widget = forms.TextInput(attrs = {'class': 'normal'}),required=True, max_length=100)
 
@@ -13,7 +14,7 @@ class CategoryForm(forms.ModelForm):
         
 from django.forms import ModelMultipleChoiceField
 
-class PostForm(forms.ModelForm):
+class PostForm(serializers.ModelSerializer):
     title = forms.CharField(widget = forms.TextInput(attrs = {'class': 'normal'}),required=True, max_length=100)
     content = RichTextField()
     categories = ModelMultipleChoiceField(queryset = Category.objects.all(), widget = forms.CheckboxSelectMultiple, required=False)

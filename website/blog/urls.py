@@ -14,23 +14,28 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-
+from django.urls import path, include
 from .forms import CustomAuthForm
 from django.contrib.auth import views as auth_views
 from . import views
+
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+router.register(r'panel', views.Panel, basename = 'panel')
 
 
 urlpatterns = [
     path(r'', views.index, name='home'),
     path(r'category/<slug:slug>', views.category_view, name='category'),
-    path(r'panel/new_post', views.panel, name='new_post'),
-    path(r'panel/settings', views.panel, name='settings'),
+    path(r'panel/new_post', views.Panel, name='new_post'),
+    path(r'panel/settings', views.Panel, name='settings'),
     path(r'panel/new_post/success', views.post_success, name='post_success'),
-	path(r'panel', views.panel, name='panel'),
+	path(r'', include(router.urls)),
+
     path(r'article/<slug:slug>', views.article_view, name='article'),
 	path(r'sign_out', views.sign_out, name='sign_out'),
 	path('login/', views.login.as_view(template_name='login.html'), name='login', kwargs={"authentication_form":CustomAuthForm}),
 
-	path(r'delete/', views.panel, name='delete'),
+	path(r'delete/', views.Panel, name='delete'),
 ]
