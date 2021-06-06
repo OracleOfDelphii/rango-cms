@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 {% load static %}
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <!--
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
@@ -17,24 +18,14 @@
 <style>
 
 
-.tags {
-  margin-left:30%;
-  margin-top:50px;
-  margin-bottom: 50px;
+.cats {
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
-  padding: 10px 20px 10px 20px;
-  background-color: #fff;
-  width: 500px;
+  background-color: black;
+  padding: 0.1em;
   border-radius: 5px;  
 }
 
-.tags h4 {
-  color:#5659C9;
-  font-size:22px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-}
-
+ 
 .cats a {
   font-size: 15px;
   text-decoration: none;
@@ -96,6 +87,7 @@ margin: 0 0 0.35em;
     <nav class = "navbar navbar-expand-md navbar-dark bg-dark">
     <div class="collapse navbar-collapse">
     <ul class="navbar-nav mr-auto">
+   <li class="nav-item"><a class="nav-link disabled" href="/"> home </a> </li> 
     {% for c in categories %}
 
     {% if forloop.first %}
@@ -144,7 +136,7 @@ margin: 0 0 0.35em;
 
     {% if article %}
     <div class="card" style="width: 18rem;">
-      <!-- <img src="..." class="card-img-top" alt="..."> -->
+<img src="{{ MEDIA_URL }}/{{article.img}}" class="card-img-top" alt="...">
       <div class="card-body">
         <h5 class="card-title">{{ article.title }}</h5>
         <p class="card-text">{{ article.content|safe}}</p>
@@ -154,7 +146,7 @@ margin: 0 0 0.35em;
 <div class="cats">
    
     {% for category in article.categories.all %}
-  <a href="/category/{{ category.slug }}"><small class="cat text-muted">{{ category }}</small></a>
+  <a href="/category/{{ category.slug }}"><small class="cat text-muted">{{ category.name }}</small></a>
     {% endfor %}
 </div>
 

@@ -10,26 +10,25 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 </script>
 
 <script type="text/javascript">
-    $(document).ready(function() {
-        $("#del").click(function() {
+      $(document).ready(function() {
+        $(".del").click(function() {
             if (!confirm("Do you want to delete")){
-      return false;
-}
-else
-{
-const request = new Request(
-   '/delete',
-    {headers: {'X-CSRFToken': csrftoken}}
-);
+                return false;
+            }
+            else {
+                const request = new Request(
+                    "/delete",
+                    {headers: {"X-CSRFToken": csrftoken}}
+                    );
 
- return fetch(request, {
-        method: 'DELETE',
-        body: {"country": "iran"},
-    }).then(response => response.text())
-}
-})
+                    return fetch(request, {
+                        method: "DELETE",
+                        body: {"id": event.target.id}, }).then(response => response.text().then(
+                        data =>  ({"status": "200", body: data})))}
+                }
+        );
+            });
 
-    })
 
 </script>
 
@@ -210,7 +209,7 @@ header, main, footer {
 <div style="display:inline-block">
 <button href = "#" style="background-color: green;"> edit </button>
 
-<button id='del'  style="background-color: red;">delete</button>
+<button id='{{a.slug}}' class="del"  style="background-color: red;">delete</button>
 <span> status : published </span>
 </div>
 </li>
@@ -253,13 +252,16 @@ header, main, footer {
 {{ form.errors }}
 {{ error }}
 
-<form id="postform" action="" method="POST">
+<form id="postform" action="" method="POST" enctype='multipart/form-data'>
 {% csrf_token %}
 
 <label for="id_title">Title:</label> 
 {{ form.title }}
 <label for="id_slug">Slug:</label> 
 {{ form.slug }}
+<label for="id_img">Image:</label> 
+{{ form.img }}
+
 <label for="id_content">Content:</label> 
 {{ form.content }}
 <div style="display:inline-block">

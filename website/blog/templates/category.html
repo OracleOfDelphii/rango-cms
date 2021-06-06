@@ -15,6 +15,40 @@
 
 
 <style>
+
+.cats {
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
+  background-color: black;
+  padding: 0.3em;
+  border-radius: 5px;  
+}
+
+ 
+.cats a {
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.cats span{
+  display: inline-block;
+}
+
+
+.cats .cat {
+  border: 1px solid #dee2e5;
+  background-color: #dee2e5;
+  border-radius: 5px;
+  padding: 1px 2px;
+  color: #8199A3;
+  transition: all 300ms ease-in-out;
+  margin-bottom: 20px;
+}
+
+.cats .cat:hover{
+  color: #fff;
+  background-color: #5659C9;
+}
+
 main, footer {
 
     margin-left: auto;
@@ -51,6 +85,8 @@ margin: 0 0 0.35em;
 <nav class = "navbar navbar-expand-md navbar-dark bg-dark">
 <div class="collapse navbar-collapse">
 <ul class="navbar-nav mr-auto">
+<li class="nav-item"><a class="nav-link disabled" href="/"> home </a> </li>
+
 {% for c in categories %}
 
 {% if forloop.first %}
@@ -77,26 +113,42 @@ margin: 0 0 0.35em;
 <div class="row mb-2">
 {% for c in articles %}
 <div class="card" style="width: 18rem;">
-  <!-- <img src="..." class="card-img-top" alt="..."> -->
+   <img src="{{MEDIA_URL}}/{{c.img}}" class="card-img-top" alt="...">
   <div class="card-body">
     <h5 class="card-title">{{ c.title }}</h5>
     {% with ct=c.content|safe %}
     <p class="card-text">{{ ct|slice:"65"}}...</p>
     {% endwith %}
 
+<!-- card footer -->
+<div class="card-footer">
+      <medium class="text-muted">{{ article.author }}</medium>
 
-{{ c.author }}
-{% for category in c.categories.all %}
-  {{ category }}
-{% endfor %}
-    <a href="/article/{{ c.slug }}" class="btn btn-primary">Continue</a>
- 
-  </div>
+<!-- cats -->
+<div class="cats">   
+    {% for category in c.categories.all %}
+  <a href="/category/{{ category.slug }}"><small class="cat text-muted">{{ category.name }}</small></a>
+    {% endfor %}
 </div>
-{% endfor %}
+
+<!-- tags -->
+<div style="margin-top:1em;">
+ <a href="/article/{{c.slug}}" class="btn btn-primary">Continue</a>
+</div>
+
+</div>
+<!-- end card-footer -->
+
+</div>
+<!-- end card-body -->
+</div>
+<!-- end card -->
+ {% endfor %}
+
 
 </div>
 </main>
+
 
 <footer>
 <span>copyright Phalanthus 2021</span>

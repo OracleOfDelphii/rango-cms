@@ -17,13 +17,20 @@ class PostForm(forms.ModelForm):
     title = forms.CharField(widget = forms.TextInput(attrs = {'class': 'normal'}),required=True, max_length=100)
     content = RichTextField()
     categories = ModelMultipleChoiceField(queryset = Category.objects.all(), widget = forms.CheckboxSelectMultiple, required=False)
+    img = forms.ImageField(required=False)
+
     new_categories = forms.CharField(label='new categories', required=False, widget = forms.TextInput(attrs = {'data-role': 'tagsinput', 'class': 'special'}))
     slug = forms.SlugField(widget = forms.TextInput(attrs = {'class': 'normal' } ))
     class Meta:
         model  = Article
-        fields = ('content','title','slug', 'categories', 'new_categories')
+        fields = ('content','title','slug', 'img', 'categories', 'new_categories')
         exclude = ('author',)
-    
+
+    def clean_img(self):
+        data = self.cleaned_data['img']
+        return data
+
+
     def clean_title(self):
         data = self.cleaned_data['title']
         if data == None:

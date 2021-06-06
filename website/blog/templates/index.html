@@ -19,6 +19,40 @@
 
 
 <style>
+
+.cats {
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
+  background-color: black;
+  padding: 0.3em;
+  border-radius: 5px;  
+}
+
+ 
+.cats a {
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.cats span{
+  display: inline-block;
+}
+
+
+.cats .cat {
+  border: 1px solid #dee2e5;
+  background-color: #dee2e5;
+  border-radius: 5px;
+  padding: 1px 2px;
+  color: #8199A3;
+  transition: all 300ms ease-in-out;
+  margin-bottom: 20px;
+}
+
+.cats .cat:hover{
+  color: #fff;
+  background-color: #5659C9;
+}
+
 main, footer {
 
     margin-left: auto;
@@ -53,6 +87,7 @@ body {
 <nav class = "navbar navbar-expand-md navbar-dark bg-dark">
 <div class="collapse navbar-collapse">
 <ul class="navbar-nav mr-auto">
+<li class="nav-item"><a class="nav-link disabled" href="/"> home </a> </li>
 {% for c in categories %}
 
 {% if forloop.first %}
@@ -85,11 +120,25 @@ body {
     {% with ct=c.content|safe %}
     <p class="card-text">{{ ct|slice:"65"}}...</p>
     {% endwith %}
-{{ c.author }}
-{% for category in c.categories.all %}
-  {{ category }}
-{% endfor %}
-    <a href="/article/{{c.slug}}" class="btn btn-primary">Continue</a>
+
+
+
+   
+<div class="card-footer">
+      <medium class="text-muted">{{ article.author }}</medium>
+<div class="cats">
+   
+    {% for category in c.categories.all %}
+  <a href="/category/{{ category.slug }}"><small class="cat text-muted">{{ category.name }}</small></a>
+    {% endfor %}
+</div>
+
+<div style="margin-top:1em;">
+ <a href="/article/{{c.slug}}" class="btn btn-primary">Continue</a>
+</div>
+
+
+     </div>
      
   </div>
 </div>

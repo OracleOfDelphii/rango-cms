@@ -21,6 +21,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 CKEDITOR_BASEPATH = "/static_files/ckeditor/"
 CKEDITOR_UPLOAD_PATH = "/static_files/ckeditor/"
 LOGIN_REDIRECT_URL = 'panel'
+
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -73,7 +76,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'blog.context_processors.categories',
                 'blog.context_processors.articles',
-
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -131,6 +134,9 @@ USE_TZ = True
 VENV_PATH = os.path.dirname(BASE_DIR)
 
 STATIC_ROOT = os.path.join(VENV_PATH, 'static_root')
+MEDIA_ROOT = os.path.join(VENV_PATH, 'media_root')
+MEDIA_URL = '/media/'
+
 
 STATICFILES_DIRS = (
 os.path.join(BASE_DIR, "static"),
