@@ -99,7 +99,7 @@ def panel(request):
             except Exception as e:
                 print(e)
                 # only for test now, will use django-rest later
-                return render(request, 'panel.html', {'form': form.__dict__})
+                return render(request, 'panel.html', {'form': form})
      
             if form.cleaned_data['new_categories'] != '':
                 for cat in form.cleaned_data['new_categories'].split(','):
@@ -115,19 +115,19 @@ def panel(request):
                     except IntegrityError as e:
                         err = f"Category: {cat} exists."
                         # only for test now, will use django-rest later
-                        return render(request, 'panel.html', {'form': form.__dict__})
+                        return render(request, 'panel.html', {'form': form})
                  
             return HttpResponseRedirect("/panel/new_post/success", content_type="application/json")
         else:               
 
             # only for test now, will use django-rest later
-            return render(request, 'panel.html', {'form': form.__dict__})
+            return render(request, 'panel.html', {'form': form})
     else:
         form = PostForm()
         # only for test now, will use django-rest later
-        print(form.__dict__)
+        print(form)
 
-        return render(request, 'panel.html', {'form': form.__dict__})
+        return render(request, 'panel.html', {'form': form})
 
 from django.contrib.auth.views import LoginView
 
