@@ -13,4 +13,4 @@ Technologies Used:
 - Ajax
 - HTML, CSS, Bootstrap
 - Sqlite3
-- -ckeditor
+- ckeditor
