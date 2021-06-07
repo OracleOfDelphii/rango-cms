@@ -1,7 +1,6 @@
 from django.shortcuts import render
 
-from .serializers import CategorySerializer, ArticleSerializer
-
+from .serializers import CategorySerializer
 # Create your views here.
 
 from django.shortcuts import get_object_or_404, HttpResponseRedirect, get_list_or_404, redirect
@@ -65,17 +64,11 @@ def handle_uploaded_image(form, request):
 
 
 from rest_framework.viewsets import ModelViewSet
-import json
 
-# problem, need to break Panel into smaller pieces
-# problem, need to write serializer for every view including PANEL
 class Panel(ModelViewSet):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'panel.html'
-    #queryset = Article.objects.all()
-    #serializer_class = ArticleSerializer
-
-
+ 
     def get(self, request): 
         form = PostForm()
         return Response({'form': form})
