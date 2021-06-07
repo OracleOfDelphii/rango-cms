@@ -63,6 +63,7 @@ def handle_uploaded_image(form, request):
     #obj.image.save('imgfilename.jpg', ContentFile(data))
 
 
+<<<<<<< HEAD
 from rest_framework.viewsets import ModelViewSet
 
 class Panel(ModelViewSet):
@@ -146,6 +147,86 @@ class Panel(ModelViewSet):
                 form = PostForm()
                 return Response({'form': form})
 
+=======
+import json
+@login_required(login_url='login')
+def panel(request):
+    if request.get_full_path() == '/delete/':
+        if request.is_ajax and request.method == "DELETE":
+            print("successfully deleted")
+            print(request.body)
+        
+        if 'json' in request.headers.get('Content-Type'):
+            js = request.json()
+        else:
+            print('Response content is not in JSON format.')
+            js = 'spam'
+
+        try: #try parsing to dict
+            dataform = str(request.body).strip("'<>() ").replace('\'', '\"')
+            struct = json.loads(dataform)
+        except:
+            print(request.body)
+ 
+    if request.get_full_path() == '/panel/settings':
+        # just showing categories for now
+        
+        if request.method == 'POST':
+            form = CategoryForm(request.POST)
+            if form.is_valid():
+                form.save(commit=True) 
+                success_message = f"Category {form.cleaned_data['name']} successfuly added" 
+                form = CategoryForm()
+                return render(request, 'panel.html', {'settings': True, 'category_form' : form, 'success_message' :success_message})
+            else:
+                return render(request, 'panel.html', {'settings': True, 'category_form': form})
+        
+        form = CategoryForm()
+        return render(request, 'panel.html', {'settings': True, 'category_form': form})
+
+    if request.method == 'POST' and request.POST and request.get_full_path() == '/panel/new_post':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user 
+            form.save()
+
+            try:
+                post.save()
+                form.save_m2m()
+            except Exception as e:
+                print(e)
+                # only for test now, will use django-rest later
+                return render(request, 'panel.html', {'form': form})
+     
+            if form.cleaned_data['new_categories'] != '':
+                for cat in form.cleaned_data['new_categories'].split(','):
+                    new_cat = Category(name=cat, slug = cat)
+                    new_cat.save()
+                    try:
+                        post.save()
+                        article_category = Articles_Categories(category_id = new_cat.id,
+                            article_id = post.id)
+                        article_category.save()
+                        print(article_category.category.id, article_category.article.id)
+                        print(new_cat.id)                             
+                    except IntegrityError as e:
+                        err = f"Category: {cat} exists."
+                        # only for test now, will use django-rest later
+                        return render(request, 'panel.html', {'form': form})
+                 
+            return HttpResponseRedirect("/panel/new_post/success", content_type="application/json")
+        else:               
+
+            # only for test now, will use django-rest later
+            return render(request, 'panel.html', {'form': form})
+    else:
+        form = PostForm()
+        # only for test now, will use django-rest later
+        print(form)
+
+        return render(request, 'panel.html', {'form': form})
+>>>>>>> parent of 97f917b (enhanced Ui)
 
 from django.contrib.auth.views import LoginView
 
