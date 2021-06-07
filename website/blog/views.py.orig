@@ -63,6 +63,91 @@ def handle_uploaded_image(form, request):
     #obj.image.save('imgfilename.jpg', ContentFile(data))
 
 
+<<<<<<< HEAD
+from rest_framework.viewsets import ModelViewSet
+
+class Panel(ModelViewSet):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'panel.html'
+ 
+    def get(self, request): 
+        form = PostForm()
+        return Response({'form': form})
+    
+    
+    def put(self, request):
+        pass
+
+    def delete(self, request, format=None):
+        if request.get_full_path() == '/delete/':
+            if request.is_ajax and request.method == "DELETE":
+                if 'json' in request.headers.get('Content-Type'):
+                    js = json.loads(request.body)
+                    article_slug = js['slug']
+                    print(article_slug)
+                    try:
+                        Article.objects.get(slug=article_slug).delete()
+                        return Response({'delete': 'success'})
+                    except Exception as e:
+                        return Response({'delete': 'fail'})
+                else:
+                    print('Response content is not in JSON format.')
+        
+    def post(self, request):
+        if request.get_full_path() == '/panel/settings':
+            serializer = CategoryForm(request.POST)
+            if serializer.is_valid():
+                serializer.save()
+                serializer = CategoryForm()
+                success_message = "successfully added"
+                resp_body = {"settings": True, "serializer": serializer,
+                                "success_message" : success_message}
+            else:                
+                resp_body = {"settings": True, "serializer": serializer,
+                                "success_message" : success_message}
+
+            return Response(resp_body)
+
+        elif request.get_full_path() == '/panel/new_post':
+
+            if request.POST:
+                form = PostForm(request.POST, request.FILES)
+                if form.is_valid():
+                    post = form # instead of post = form.save(commit=False)
+                    post.author = request.user 
+                    form.save()
+
+                    try:
+                        post.save()
+                        #form.save_m2m() override create for PostForm to support many to many relationship
+                    except Exception as e:
+                        print(e)
+                        # only for test now, will use django-rest later
+                        return Response({'form': form})
+
+                    if form.cleaned_data['new_categories'] != '':
+                        for cat in form.cleaned_data['new_categories'].split(','):
+                            new_cat = CategorySerializer(name=cat, slug = cat)
+                            new_cat.save()
+                            try:
+                                post.save()
+                                article_category = Article_Category_Serializer(category_id = new_cat.id,
+                                
+                                article_id = post.id) # write serializer for Article_Category
+                                article_category.save()
+
+                            except IntegrityError as e:
+                                err = f"Category: {cat} exists."
+                                # only for test now, will use django-rest later
+                                return render(request, 'panel.html', {'form': form})
+                    return redirect("/panel/new_post/success")
+
+            # only for test now, will use django-rest later
+            else:
+                form = PostForm()
+                return Response({'form': form})
+
+=======
 import json
 @login_required(login_url='login')
 def panel(request):
@@ -141,6 +226,7 @@ def panel(request):
         print(form)
 
         return render(request, 'panel.html', {'form': form})
+>>>>>>> parent of 97f917b (enhanced Ui)
 
 from django.contrib.auth.views import LoginView
 
