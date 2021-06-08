@@ -19,23 +19,20 @@ from .forms import CustomAuthForm
 from django.contrib.auth import views as auth_views
 from . import views
 
-from rest_framework import routers
+#router.register(r'panel', views.panel.as_view(), basename = 'panel')
+#router.register(r'panel/new_post', views.panel.as_view(), basename = 'panel_new_post')
+#router.register(r'panel/new_post/success', views.panel, basename = 'panel_post_success')
+#router.register(r'panel/settings/', views.panel, basename = 'panel_settings')
 
-router = routers.DefaultRouter()
-router.register(r'panel', views.Panel, basename = 'panel')
-
+#router.register(r'panel/delete/', views.panel, basename = 'panel_delete_post')
 
 urlpatterns = [
     path(r'', views.index, name='home'),
     path(r'category/<slug:slug>', views.category_view, name='category'),
-    path(r'panel/new_post', views.Panel, name='new_post'),
-    path(r'panel/settings', views.Panel, name='settings'),
-    path(r'panel/new_post/success', views.post_success, name='post_success'),
-	path(r'', include(router.urls)),
-
     path(r'article/<slug:slug>', views.article_view, name='article'),
-	path(r'sign_out', views.sign_out, name='sign_out'),
-	path('login/', views.login.as_view(template_name='login.html'), name='login', kwargs={"authentication_form":CustomAuthForm}),
-
-	path(r'delete/', views.Panel, name='delete'),
+	path(r'sign_out/', views.sign_out, name='sign_out'),
+	path(r'panel/', views.panel, name='panel'),
+    path(r'panel/new_post/', views.panel, name='panel_new_post'), 
+    path(r'panel/new_post/success/', views.post_success, name='post_success'),
+    path('login/', views.login.as_view(template_name='login.html'), name='login', kwargs={"authentication_form":CustomAuthForm}),
 ]

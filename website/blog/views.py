@@ -18,18 +18,22 @@ from rest_framework.decorators import api_view
 from rest_framework import serializers
 from rest_framework.views import APIView
 from rest_framework.renderers import TemplateHTMLRenderer, StaticHTMLRenderer
+from django.contrib.auth import logout
+from rest_framework.viewsets import ModelViewSet
+import json
 
+from rest_framework import renderers
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.response import Response
+
+@api_view(['GET'])
+@renderer_classes([TemplateHTMLRenderer])
 @login_required(login_url='login')
 def post_success(request):
-    return render(request, "post_success.html")
+    if request.method == "GET":
+        return Response(request, "post_success.html")
 
-class post_success(APIView):
-    render_classes = [StaticHTMLRenderer]
-    template_name = 'post_success.html'
-
-
-
-from django.contrib.auth import logout
 
 @login_required(login_url='login')
 def sign_out(request):
@@ -63,22 +67,90 @@ def handle_uploaded_image(form, request):
     
     #obj.image.save('imgfilename.jpg', ContentFile(data))
 
+@api_view(['GET', 'POST'])
+@renderer_classes([TemplateHTMLRenderer])
+def panel(request):
+    if request.method == 'GET':
+        serializer = PostForm(data={})
+        if serializer.is_valid():
+            return Response({'form': serializer, 'style': {}}, template_name='panel.html')        
+        
+        return Response({'form': serializer, 'style': {}}, template_name='panel.html')
 
-from rest_framework.viewsets import ModelViewSet
-import json
+    if request.method == 'POST':
+        if request.get_full_path() == '/panel/settings':
+            serializer = CategoryForm(request.POST)
+            if serializer.is_valid():
+                serializer.save()
+                serializer = CategoryForm()
+                success_message = "successfully added"
+                resp_body = {"settings": True, "serializer": serializer,
+                                "success_message" : success_message}
+            else:                
+                resp_body = {"settings": True, "serializer": serializer,
+                                "success_message" : success_message}
+
+            return Response(resp_body)
+
+        elif request.get_full_path() == '/panel/new_post/':
+            form = PostForm(data=request.data)
+
+            if form.is_valid():
+                post = ArticleSerializer(data=form.validated_data) # instead of post = form.save(commit=False)
+                try:
+                    if post.is_valid():
+                        post.validated_data['author'] = request.user
+                    try:
+                        post.save()
+                    except Exception as e:
+                        print(e)
+
+                except Exception as e:
+                    print("exception occured", e)
+                    print(post.initial_data)
+
+                    # only for test now, will use django-rest later
+                    return Response({'form': form, 'style': {}}, template_name='panel.html')
+                
+                if hasattr(form.validated_data, 'new_categories') and form.validated_data['new_categories'] != '':
+                      for cat in form.validated_data['new_categories'].split(','):
+                        new_cat = CategorySerializer(name=cat, slug = cat)
+                        if new_cat.is_valid():
+                            new_cat.save()
+                        try:
+                            post.save()
+                            article_category = Article_Category_Serializer(category_id = new_cat.id,
+                                
+                            article_id = post.id) # write serializer for Article_Category
+                            if article_category.is_valid():
+                                article_category.save()
+
+                        except IntegrityError as e:
+                            err = f"Category: {cat} exists."
+                            # only for test now, will use django-rest later
+                            print(err)              
+                            return Response({'form': form, 'style': {}}, template_name='panel.html')
+                
+                return redirect("/panel/new_post/success")
+
+        # only for test now, will use django-rest later
+            else:
+                print(form.errors)
+                return Response({'form': {}, 'style': {}}, template_name='panel.html')
+
 
 # problem, need to break Panel into smaller pieces
 # problem, need to write serializer for every view including PANEL
 class Panel(ModelViewSet):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'panel.html'
-    #queryset = Article.objects.all()
+    queryset = Article.objects.all()
     #serializer_class = ArticleSerializer
 
 
     def get(self, request): 
         form = PostForm()
-        return Response({'form': form})
+        return Response({'form': form}, template_name='panel.html')
     
     
     def put(self, request):
@@ -117,7 +189,7 @@ class Panel(ModelViewSet):
         elif request.get_full_path() == '/panel/new_post':
 
             if request.POST:
-                form = PostForm(request.POST, request.FILES)
+                form = PostForm(request.data)
                 if form.is_valid():
                     post = form # instead of post = form.save(commit=False)
                     post.author = request.user 

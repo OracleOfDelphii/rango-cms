@@ -2,6 +2,8 @@ from django import forms
 from .models import Article, Category
 from ckeditor.fields import RichTextField
 from django.core.exceptions import ValidationError
+from django.db import  IntegrityError
+
 
 from rest_framework import serializers
 class CategoryForm(serializers.ModelSerializer):
@@ -12,47 +14,26 @@ class CategoryForm(serializers.ModelSerializer):
         model = Category
         fields = ('name', 'slug')
         
+from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from django.forms import ModelMultipleChoiceField
-
-class PostForm(serializers.ModelSerializer):
-    title = forms.CharField(widget = forms.TextInput(attrs = {'class': 'normal'}),required=True, max_length=100)
-    content = RichTextField()
-    categories = ModelMultipleChoiceField(queryset = Category.objects.all(), widget = forms.CheckboxSelectMultiple, required=False)
-    img = forms.ImageField(required=False)
-
-    new_categories = forms.CharField(label='new categories', required=False, widget = forms.TextInput(attrs = {'data-role': 'tagsinput', 'class': 'special'}))
-    slug = forms.SlugField(widget = forms.TextInput(attrs = {'class': 'normal' } ))
-    class Meta:
-        model  = Article
-        fields = ('content','title','slug', 'img', 'categories', 'new_categories')
-        exclude = ('author',)
-
-    def clean_img(self):
-        data = self.cleaned_data['img']
-        return data
+class PostForm(serializers.Serializer):
+    title =  serializers.CharField(required=True, max_length=100, style={'base_template': 'input.html'})
+    content = serializers.CharField(style={'base_template': 'textarea.html'})
+    categories = serializers.MultipleChoiceField(choices = Category.objects.all(), required=False, style={'base_template': 'select_multiple.html'})
+    img = serializers.ImageField(required=False, style={'base_template': 'input.html'})
+    new_categories = serializers.CharField(label='new categories', required=False) #widget = forms.TextInput(attrs = {'data-role': 'tagsinput', 'class': 'special'}))
+    slug = serializers.SlugField(validators=[UniqueValidator(queryset=Article.objects.all())], style={'base_template': 'input.html'})#widget = forms.TextInput(attrs = {'class': 'normal' } )))    
 
 
-    def clean_title(self):
-        data = self.cleaned_data['title']
-        if data == None:
-            raise ValidationError("Field title is required")
-        return data
+    def create(self, validated_data):
+        x = self.validated_data       
+        article = Article(title = x['title'], content = x['content'], img = x['img'],  slug = x['slug'], categories = x['categories'])
+        return article    
 
-    def clean_content(self):
-        data = self.cleaned_data['content']
-        if data == None:
-            raise ValidationError("Field content is required")
-        return data
 
-    def clean_slug(self):
-        data = self.cleaned_data['slug']
-        if data == None:
-            raise ValidationError("Field slug is required")
-        return data
-     
     def clean(self):
         cleaned_data = super().clean()
-        new_categories = cleaned_data.get("new_categories")        
+        new_categories = cleaned_data.get("new_categories")
         categories = cleaned_data.get("categories")
         if not (categories or new_categories):
             raise ValidationError("either add a new category or choose from categories")

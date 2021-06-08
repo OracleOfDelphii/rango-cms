@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
  {% load static %}
-
+{% load rest_framework %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 {% csrf_token %}
 <script>
@@ -156,6 +156,8 @@ header, main, footer {
 
 </style>
 </head>
+
+{% block content %}
   <body>
 		
 		<div class="wrapper d-flex align-items-stretch">
@@ -223,7 +225,7 @@ header, main, footer {
 <div style="display:list-items">
 <form id="changeCatForm" action="" method="POST">
 {% csrf_token %}
-
+{% render_form form %}
 <h2 style="color:orange;">{{ category_form.errors }}</h2>
 
 {% if success_message %}
@@ -234,14 +236,11 @@ header, main, footer {
 <li class="list-group-item"> Add Category </li>
 
   <li class="list-group-item list-group-item-secondary">
-<label for="id_name">Name:</label> 
-{{ category_form.name }}
+{% render_field  category_form.name style=style %}
 </li>
   <li class="list-group-item list-group-item-secondary">
 
-<label for="id_slug">Slug:</label> 
-{{ category_form.slug }}
-
+{% render_field  category_form.slug style=style %}
 </li>
 
 <button type="submit" class="btn btn-lg btn-primary btn-block submit"> add category </button>
@@ -252,26 +251,26 @@ header, main, footer {
 
 {% if form %}	
 	<div style="display:list-items">
-{{ form.errors }}
-{{ error }}
+
 
 <form id="postform" action="" method="POST" enctype='multipart/form-data'>
 {% csrf_token %}
 
-<label for="id_title">Title:</label> 
-{{ form.title }}
-<label for="id_slug">Slug:</label> 
-{{ form.slug }}
-<label for="id_img">Image:</label> 
-{{ form.img }}
+{% render_field  form.title style=style %}
 
-<label for="id_content">Content:</label> 
-{{ form.content }}
+{% render_field  form.slug style=style %}
+
+{% render_field  form.img style=style %}
+
+
+
+{% render_field  form.content style=style %}
+
 <div style="display:inline-block">
-<label for="id_categories">Category:</label> 
-{{ form.categories }}
-<label for="id_new_categories">Or add new category:</label> 
-{{ form.new_categories }}
+
+{% render_field  form.categories style=style %}
+
+{% render_field  form.new_categories style=style %}
 
 <button type="submit" class="btn btn-lg btn-primary btn-block submit"> submit </button>
 </form>
@@ -294,5 +293,7 @@ header, main, footer {
 <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
 <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 {% endif %}
-  </body>
+{% endblock %}
+  
+</body>
 </html>

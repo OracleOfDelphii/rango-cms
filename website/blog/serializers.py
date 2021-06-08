@@ -12,5 +12,5 @@ class CategorySerializer(serializers.ModelSerializer):
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
-        fields = ['name', 'title', 'slug', 'img', 'content', 'categories']
+        fields = ['title', 'slug', 'img', 'content', 'categories']
         
