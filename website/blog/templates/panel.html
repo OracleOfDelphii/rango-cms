@@ -45,6 +45,7 @@ jQuery(document).on( "keydown", ".normal", function(e){if (e.keyCode == 13) {ret
 <link rel="stylesheet" href="http://bootstrap-tagsinput.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.css">
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
 
+
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 		<link rel="stylesheet" href="{% static 'sidebar-09/css/style.css' %}">
 
@@ -222,6 +223,7 @@ header, main, footer {
 
 </ul>
 
+
 <div style="display:list-items">
 <form id="changeCatForm" action="" method="POST">
 {% csrf_token %}
@@ -256,21 +258,14 @@ header, main, footer {
 <form id="postform" action="" method="POST" enctype='multipart/form-data'>
 {% csrf_token %}
 
-{% render_field  form.title style=style %}
-
-{% render_field  form.slug style=style %}
-
-{% render_field  form.img style=style %}
-
-
-
-{% render_field  form.content style=style %}
-
+{{form.title}}
+{{form.slug}}
+{{form.img}}
+{{form.content}}
 <div style="display:inline-block">
 
-{% render_field  form.categories style=style %}
-
-{% render_field  form.new_categories style=style %}
+{{form.categories}}
+{{form.new_categories}}
 
 <button type="submit" class="btn btn-lg btn-primary btn-block submit"> submit </button>
 </form>

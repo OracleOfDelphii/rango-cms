@@ -1,11 +1,10 @@
 from django.shortcuts import render
 
-from .serializers import CategorySerializer, ArticleSerializer
-
+from .serializers import CategorySerializer, ArticleSerializer, Article_Category_Serializer
 # Create your views here.
 
 from django.shortcuts import get_object_or_404, HttpResponseRedirect, get_list_or_404, redirect
-from .models import  Category, Article
+from .models import  Category, Article, Article_Category
 from django.contrib.auth.models import User
 from django import forms
 from .forms import PostForm, CategoryForm
@@ -21,7 +20,6 @@ from rest_framework.renderers import TemplateHTMLRenderer, StaticHTMLRenderer
 from django.contrib.auth import logout
 from rest_framework.viewsets import ModelViewSet
 import json
-
 from rest_framework import renderers
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.decorators import api_view, renderer_classes
@@ -32,8 +30,7 @@ from rest_framework.response import Response
 @login_required(login_url='login')
 def post_success(request):
     if request.method == "GET":
-        return Response(request, "post_success.html")
-
+        return Response(template_name =  "post_success.html")
 
 @login_required(login_url='login')
 def sign_out(request):
@@ -42,8 +39,6 @@ def sign_out(request):
         return render(request, "logged_out.html")
     else:
         return HttpResponseRedirect('login', content_type='application/json')
-
-from .models import Article_Category
 
 from website.settings import MEDIA_URL
 
@@ -67,16 +62,14 @@ def handle_uploaded_image(form, request):
     
     #obj.image.save('imgfilename.jpg', ContentFile(data))
 
-@api_view(['GET', 'POST'])
+
+@api_view(['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
 @renderer_classes([TemplateHTMLRenderer])
 def panel(request):
     if request.method == 'GET':
-        serializer = PostForm(data={})
-        if serializer.is_valid():
-            return Response({'form': serializer, 'style': {}}, template_name='panel.html')        
-        
-        return Response({'form': serializer, 'style': {}}, template_name='panel.html')
-
+        form = PostForm()
+        return render(request, 'panel.html',  {'form': form})
+    
     if request.method == 'POST':
         if request.get_full_path() == '/panel/settings':
             serializer = CategoryForm(request.POST)
@@ -94,22 +87,16 @@ def panel(request):
 
         elif request.get_full_path() == '/panel/new_post/':
             form = PostForm(data=request.data)
-
             if form.is_valid():
-                post = ArticleSerializer(data=form.validated_data) # instead of post = form.save(commit=False)
-                try:
-                    if post.is_valid():
-                        post.validated_data['author'] = request.user
-                    try:
-                        post.save()
-                    except Exception as e:
-                        print(e)
-
-                except Exception as e:
-                    print("exception occured", e)
-                    print(post.initial_data)
-
-                    # only for test now, will use django-rest later
+                post = ArticleSerializer(data=form.validated_data)
+                if post.is_valid():
+                    post = post.save(author = request.user) 
+                    article = Article.objects.first
+                    print("#$#$#$", post)
+                    for i in form.validated_data['categories']:
+                        ac = Article_Category(article= post, category = i)
+                        ac.save()
+                    
                     return Response({'form': form, 'style': {}}, template_name='panel.html')
                 
                 if hasattr(form.validated_data, 'new_categories') and form.validated_data['new_categories'] != '':
@@ -119,23 +106,18 @@ def panel(request):
                             new_cat.save()
                         try:
                             post.save()
-                            article_category = Article_Category_Serializer(category_id = new_cat.id,
-                                
-                            article_id = post.id) # write serializer for Article_Category
-                            if article_category.is_valid():
-                                article_category.save()
 
                         except IntegrityError as e:
                             err = f"Category: {cat} exists."
                             # only for test now, will use django-rest later
                             print(err)              
                             return Response({'form': form, 'style': {}}, template_name='panel.html')
-                
-                return redirect("/panel/new_post/success")
-
+ 
+                return redirect("/panel/new_post/success", content_type='application/json')
         # only for test now, will use django-rest later
             else:
-                print(form.errors)
+                print(form.data)
+
                 return Response({'form': {}, 'style': {}}, template_name='panel.html')
 
 
@@ -186,16 +168,15 @@ class Panel(ModelViewSet):
 
             return Response(resp_body)
 
-        elif request.get_full_path() == '/panel/new_post':
-
+        elif request.get_full_path() == '/panel/new_post/':
             if request.POST:
                 form = PostForm(request.data)
+                print(form.validated_data, form.data)
                 if form.is_valid():
-                    post = form # instead of post = form.save(commit=False)
-                    post.author = request.user 
-                    form.save()
-
+                    post = form
+                    form.save(author = request.user)
                     try:
+                        print(form.validated_data)
                         post.save()
                         #form.save_m2m() override create for PostForm to support many to many relationship
                     except Exception as e:
@@ -234,20 +215,21 @@ class login(LoginView):
     template_name = 'login.html'
     form_class = CustomAuthForm
 
-
-from annoying.functions import get_object_or_None
+@api_view(['GET'])
+@renderer_classes([TemplateHTMLRenderer])
 def category_view(request, slug):
     category = Category.objects.get(slug = slug)
     articles = Article.objects.filter(categories__in = [category])
-    return render(request, 'category.html', {'articles': articles})
+    return Response({'articles': articles}, template_name='category.html')
 
-from .models import Article_Category
-
+@api_view(['GET'])
+@renderer_classes([TemplateHTMLRenderer])
 def article_view(request, slug):
     article =  Article.objects.get(slug = slug)
-    return render(request, 'Article.html', {'article': article})
+    return Response({'article': article}, template_name='Article.html')
 
-@login_required(login_url='login')
+@api_view(['GET'])
+@renderer_classes([TemplateHTMLRenderer])
 def index(request):
     articles = Article.objects.all()
-    return render(request, 'index.html', {'articles': articles})
+    return Response({'articles': articles}, template_name = 'index.html')

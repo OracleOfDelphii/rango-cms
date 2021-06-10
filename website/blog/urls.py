@@ -35,4 +35,8 @@ urlpatterns = [
     path(r'panel/new_post/', views.panel, name='panel_new_post'), 
     path(r'panel/new_post/success/', views.post_success, name='post_success'),
     path('login/', views.login.as_view(template_name='login.html'), name='login', kwargs={"authentication_form":CustomAuthForm}),
+    path(r'panel/settings/', views.panel, name = 'panel_settings'),
+    path(r'panel/delete/', views.panel, name = 'panel_delete_post')
+
+
 ]
