@@ -1,6 +1,6 @@
 # rango-cms
 
-A mini-CMS developed with Django(And will later Add django-rest).
+A mini-CMS developed with Django framework.
 
 ## Current features:
 - Seperate adminstratoin Panel with nice Bootstrap powered UI
