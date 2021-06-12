@@ -29,9 +29,8 @@
  
 .container-fluid {
     margin-right: auto;
-    background-color: #3d5c76;
     margin-left: auto;
-
+}
  
 .cats a {
   font-size: 15px;
@@ -91,8 +90,8 @@ body {
 
 <nav class = "navbar navbar-expand-md navbar-dark bg-dark">
 <div class="collapse navbar-collapse">
-<ul class="navbar-nav mr-auto">
-<li class="nav-item"><a class="nav-link disabled" href="/"> home </a> </li>
+<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+<li class="nav-item"><a class="nav-link" href="/"> home </a> </li>
 {% for c in categories %}
 
 {% if forloop.first %}
@@ -113,48 +112,59 @@ body {
 </nav>
 </header>
 
-<body>
-<main>
-<div class="row mb-2">
+    <body>
+    <main>
+    <div class="row mb-2">
 
-{% for c in articles %}
-<div class="card" style="width: 18rem;">
-  <!-- <img src="..." class="card-img-top" alt="..."> -->
-  <div class="card-body">
-    <h5 class="card-title">{{ c.title }}</h5>
-    {% with ct=c.content|safe %}
-    <p class="card-text">{{ ct|slice:"65"}}...</p>
-    {% endwith %}
+    {% for c in articles %}
+    <div class="card" style="width: 18rem;">
+    <img src="{{ MEDIA_URL }}/{{c.img}}" class="card-img-top" alt="...">
+
+      <div class="card-body">
+        <h5 class="card-title">{{ c.title }}</h5>
+        {% with ct=c.content|safe %}
+        <p class="card-text">{{ ct|slice:"500"}}...</p>
+        {% endwith %}
 
 
 
-   
-<div class="card-footer">
-      <medium class="text-muted">{{ article.author }}</medium>
-<div class="cats">
-   
-    {% for category in c.categories.all %}
-  <a href="/category/{{ category.slug }}"><small class="cat text-muted">{{ category.name }}</small></a>
+       
+    <div class="card-footer">
+          <medium class="text-muted">{{ article.author }}</medium>
+    <div class="cats">
+        {% for category in c.categories.all %}
+      <a href="/category/{{ category.slug }}"><small class="cat text-muted">{{ category.name }}</small></a>
+        {% endfor %}
+    </div>
+
+    <div style="margin-top:1em;">
+     <a href="/article/{{c.slug}}" class="btn btn-primary">Continue</a>
+    </div>
+
+
+         </div>
+         
+      </div>
+    </div>
     {% endfor %}
-</div>
 
-<div style="margin-top:1em;">
- <a href="/article/{{c.slug}}" class="btn btn-primary">Continue</a>
-</div>
+    </div>
+    </main>
+
+<footer class="text-center text-lg-start bg-light text-muted">
+         <!-- Copyright -->
+          <div class="text-center p-4" style="background-color: rgba(0, 0, 0, 0.05);">
+
+        <span>copyright Phalanthus 2021</span>
+         <!-- Copyright -->
+
+        <a class="text-reset fw-bold" href="#">Rango CMS</a>
+      </div>
+      <!-- Copyright -->
+    </footer>
 
 
-     </div>
-     
-  </div>
-</div>
-{% endfor %}
 
-</div>
-</main>
-
-<footer>
-<span>copyright Phalanthus 2021</span>
-</footer>
 
 </body>
 </div>

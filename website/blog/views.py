@@ -43,6 +43,7 @@ def sign_out(request):
         rd = request.GET.get('next') 
         return redirect(rd)
 
+from django.db import transaction
 
 @login_required(login_url='login')
 @api_view(['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
@@ -108,27 +109,29 @@ def panel(request, **kwargs):
         elif request.get_full_path() == '/panel/new_post/':
             form = PostForm(request.POST, request.FILES)
             if form.is_valid():
-                post = form.save(commit = False, author = request.user)
-                print(request.POST)
-                if form.is_valid() and post:
-                    if 'categories' in form.cleaned_data and form.cleaned_data['categories'] != '':
-                        for category in form.cleaned_data['categories']:
-                            ac = Article_Category(article = post, category = category)
- 
-                    if 'new_categories' in form.cleaned_data and form.cleaned_data['new_categories'] != '':
-                        for cat in form.cleaned_data['new_categories'].split(','):
-                            try:
-                                new_cat = Category(name = cat, slug = slugify(cat))
-                                new_cat.save()
-                                ac = Article_Category(article = post, category = new_cat)
+                with transaction.atomic():
+                    post = form.save(commit = False, author = request.user)
+                    print(request.POST)
+                    if form.is_valid():
+                        post.save()
+                        if 'categories' in form.cleaned_data and form.cleaned_data['categories'] != '':
+                            for category in form.cleaned_data['categories']:
+                                ac = Article_Category(article = post, category = category)
                                 ac.save()
-                                form.save(commit = True)
-                            except IntegrityError as e:  
-                                return Response({'form': form, 'style': {}, "error" : "invalid category entry"}, template_name='panel.html')
+                        if 'new_categories' in form.cleaned_data and form.cleaned_data['new_categories'] != '':
+                            for cat in form.cleaned_data['new_categories'].split(','):
+                                try:
+                                    new_cat = Category(name = cat, slug = slugify(cat))
+                                    new_cat.save()
+                                    ac = Article_Category(article = post, category = new_cat)
+                                    ac.save()
+                                    form.save(commit = True)
+                                except (IntegrityError, ValueError) as e:  
+                                    return Response({'form': form, 'style': {}, "error" : "invalid category entry"}, template_name='panel.html')
 
 
-                form.save(commit=True)
-                return redirect("/panel/new_post/success", content_type='application/json')
+                    form.save(commit=True)
+                    return redirect("/panel/new_post/success", content_type='application/json')
             
             else:
                 return Response({'form': form, 'style': {}}, template_name='panel.html')
@@ -149,6 +152,7 @@ class login(LoginView):
     class Meta:
         fields = ['username', 'password', 'remember']
 
+from django.core.exceptions import ObjectDoesNotExist
 
 @api_view(['GET'])
 def delete_view(request, slug):
@@ -164,7 +168,10 @@ def category_view(request, slug):
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])
 def article_view(request, slug):
-    article =  Article.objects.get(slug = slug)
+    try:
+        article =  Article.objects.get(slug = slug)
+    except (ObjectDoesNotExist) as e:    
+        return Response({'articles' : []}, status = status.HTTP_404_NOT_FOUND, template_name='article.html')
     return Response({'article': article}, template_name='Article.html')
 
 @api_view(['GET'])
