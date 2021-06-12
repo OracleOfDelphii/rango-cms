@@ -10,8 +10,17 @@ A mini-CMS developed with Django(And will later Add django-rest).
 - add/delete categories
 - nice Login UI with bootstrap
 
-### 
-Implemented serializers to develop API later.
+### Technologies Used:
+- Django3.1.12 and Django rest 3.12.4
+- Ajax
+- HTML, CSS, Bootstrap
+- Sqlite3
+- ckeditor
+- Dja
+
+#### TO-DO
+API(implemented serializers for now)
+
 
 ![login](/screenshots/login.jpg?raw=true)
 ![panel](/screenshots/panel.png?raw=true)
@@ -20,11 +29,3 @@ Implemented serializers to develop API later.
 ![panel](/screenshots/post.png?raw=true)
 
 
-###
-Technologies Used:
-- Django3.1.12 and Django rest 3.12.4
-- Ajax
-- HTML, CSS, Bootstrap
-- Sqlite3
-- ckeditor
-- Dja
