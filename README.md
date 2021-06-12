@@ -21,11 +21,10 @@ A mini-CMS developed with Django(And will later Add django-rest).
 #### TO-DO
 API(implemented serializers for now)
 
+##### Screenshots:
 
-![login](/screenshots/login.jpg?raw=true)
 ![panel](/screenshots/panel.png?raw=true)
 ![panel](/screenshots/panel2.png?raw=true)
 ![panel](/screenshots/panel3.png?raw=true)
 ![panel](/screenshots/post.png?raw=true)
-
-
+![login](/screenshots/login.jpg?raw=true)
