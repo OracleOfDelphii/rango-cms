@@ -1,5 +1,7 @@
 .idea/
 venv/
+VirtualEnv/
+media_root/
 static_root/
 website/static/
 website/website/__pycache__/
