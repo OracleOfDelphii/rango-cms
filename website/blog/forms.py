@@ -5,26 +5,23 @@ from django.core.exceptions import ValidationError
 from django.db import  IntegrityError
 from ckeditor.fields import RichTextFormField
 
-from rest_framework import serializers
-class CategoryForm(serializers.ModelSerializer):
-    name = serializers.CharField(style={'class': 'normal', 'base_template': 'input.html'}, required=True, max_length=100) 
-    slug = serializers.CharField(style={'class': 'normal', 'base_template': 'input.html'}, required=True, max_length=100)
-
+class CategoryForm(forms.ModelForm):
+    name = forms.CharField(widget = forms.TextInput(attrs = {'class': 'form-control', 'placeholder': 'name'}), required=True, max_length=100) 
+    slug = forms.CharField(widget = forms.TextInput(attrs = {'class': 'form-control', 'placeholder': 'slug'}), required=True, max_length=100)
     class Meta:
         model = Category
-        fields = ('name', 'slug')
-        
+        fields = '__all__'
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from django.forms import ModelMultipleChoiceField
 
 
 class PostForm(forms.ModelForm):
-    title = forms.CharField(required = True, max_length = 100, widget = forms.TextInput(attrs = {'class': 'normal'}) )
+    title = forms.CharField(required = True, max_length = 100, widget = forms.TextInput(attrs = {'class': 'normal', 'placeholder' : 'title'}) )
     content = RichTextField()
     categories = ModelMultipleChoiceField(queryset = Category.objects.all(), widget = forms.CheckboxSelectMultiple(attrs = {'class': 'normal list-unstyled'}), required = False)
     img = forms.ImageField(required=False, widget = forms.ClearableFileInput(attrs = {'class': 'normal', 'style': 'padding: 2em'}))
-    new_categories = forms.CharField(label='new categories', required=False, widget = forms.TextInput(attrs = {'data-role': 'tagsinput', 'class': 'special'}))
-    slug = forms.SlugField(widget = forms.TextInput(attrs = {'class': 'normal' } ))
+    new_categories = forms.CharField(label='new categories', required=False, widget = forms.TextInput(attrs = {'data-role': 'tagsinput', 'class': 'special', 'placeholder' : 'new category + enter'}))
+    slug = forms.SlugField(widget = forms.TextInput(attrs = {'class': 'normal', 'placeholder' : 'slug' } ))
     class Meta:
         model  = Article
         fields = ('content','title','slug', 'img', 'categories', 'new_categories')
@@ -96,7 +93,8 @@ class PostForm(forms.ModelForm):
 
 from django.contrib.auth.forms import AuthenticationForm
 from django.forms.widgets import PasswordInput, TextInput
-
+from django.forms import CheckboxInput
 class CustomAuthForm(AuthenticationForm):
-    username = forms.CharField(widget=TextInput(attrs={'placeholder': 'username', 'class': 'form-control'}))
-    password = forms.CharField(widget=PasswordInput(attrs={'placeholder':'Password', 'class': 'form-control'}))
+    username = forms.CharField(required=True, widget=TextInput(attrs={'placeholder': 'username', 'class': 'form-control'}))
+    password = forms.CharField(required=True, widget=PasswordInput(attrs={'placeholder':'Password', 'class': 'form-control'}))
+    remember = forms.BooleanField(required = False, label = "Remember me")

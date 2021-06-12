@@ -293,7 +293,7 @@ header, main, footer {
             <a href="/panel/settings"><span class="fa fa-cog mr-3"></span> Settings</a>
           </li>
           <li>
-            <a href="#"><span class="fa fa-support mr-3"></span> Support</a>
+            <a href="#"><span class="fa fa-code mr-3"></span> Api</a>
           </li>
           <li>
             <a href="/sign_out"><span class="fa fa-sign-out mr-3"></span> Sign Out</a>
@@ -369,12 +369,8 @@ header, main, footer {
     <button class="btn btn-outline-secondary" type="submit">add category</button>
   </div>
 
-{% for field in category_form %}
-  {% if not field.read_only %}
-<div class="normal" style="padding: 1px;"> {% render_field field style=style %} </div>
-{% endif %}
-{% endfor %}
-
+<div class="normal" style="padding: 1px;"> {{ category_form.name }} </div>
+<div class="normal" style="padding: 1px;">  {{ category_form.slug }} </div>
 </div>
 </form>
 </div>
@@ -395,6 +391,8 @@ header, main, footer {
 <form id="postform" action="" method="POST" enctype='multipart/form-data'>
 {% csrf_token %}
 
+{{ form.errors }}
+{{ error }}
 {{form.title}}
 {{form.slug}}
 {{form.img}}
