@@ -18,11 +18,11 @@ class Article_Category(models.Model):
 
 
 class Article(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=50, unique=True)
     img = models.ImageField(upload_to='articles', default = 'articles/default.jpg')
     categories = models.ManyToManyField('Category', through='Article_Category')
-    content = RichTextField()
+    content = RichTextField() # unique = True :))
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
