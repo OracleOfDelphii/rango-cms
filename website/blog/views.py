@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from django.utils.text import slugify
 from .serializers import CategorySerializer, ArticleSerializer, Article_Category_Serializer
 # Create your views here.
 
@@ -24,6 +24,7 @@ from rest_framework import renderers
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
+from .forms import CustomAuthForm
 
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])
@@ -32,87 +33,118 @@ def post_success(request):
     if request.method == "GET":
         return Response(template_name =  "post_success.html")
 
-@login_required(login_url='login')
+@login_required(login_url='login', redirect_field_name=None)
 def sign_out(request):
     if request.user.is_authenticated:
         logout(request)
-        return render(request, "logged_out.html")
+        form = CustomAuthForm()
+        return redirect('/login')
     else:
-        return HttpResponseRedirect('login', content_type='application/json')
+        rd = request.GET.get('next') 
+        return redirect(rd)
 
 from website.settings import MEDIA_URL
 
 from django.core.files.base import ContentFile
 
-def handle_uploaded_image(form, request):
-    img = request.FILES['img']
-    
-    f = img.file
 
-    data = f.read()
-    form.cleaned_data['img'] = '/nothing/'
-#    form.save()
-
-    # obj.image is the ImageField
-    print(f)
-#    print(data)
-    print(img)
-
-    return form
-    
-    #obj.image.save('imgfilename.jpg', ContentFile(data))
+from rest_framework import status
 
 
+@login_required(login_url='login')
 @api_view(['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
 @renderer_classes([TemplateHTMLRenderer])
-def panel(request):
-    if request.method == 'GET':
-        form = PostForm()
-        return render(request, 'panel.html',  {'form': form})
-    
+def panel(request, **kwargs):
+    if request.method == 'DELETE':
+        print(request.get_full_path())
+        print(kwargs)
+        if 'json' in request.headers.get('Content-Type'):
+            js = json.loads(request.body)
+            if js['object_type'] == 'article':
+                article_slug = js['slug']
+                try:
+                    Article.objects.get(slug=article_slug).delete() 
+                    return Response({"successful" : 'true'}, status = status.HTTP_200_OK, template_name='article.html')
+                except Exception as e: 
+                    return Response({"successful" : 'false'}, status = status.HTTP_200_OK, template_name='article.html')
+            elif js['object_type'] == 'category':
+                category_slug = js['slug']
+                try:
+                    Category.objects.get(slug=category_slug).delete() 
+                    return Response({"successful" : 'true'}, status = status.HTTP_200_OK, template_name='article.html')
+                except Exception as e: 
+                    return Response({"successful" : 'false'}, status = status.HTTP_200_OK, template_name='article.html')
+        else:
+            print(request.headers.get('Content-Type'))
+            print('Response content is not in JSON format.')
+
+    if request.method == 'GET': 
+        if request.get_full_path() == '/panel/new_post/':
+            form = PostForm()
+            return render(request, 'panel.html',  {'form': form})
+
+        elif request.get_full_path() == '/panel/settings/':
+            response_body = {}
+            category_form = CategoryForm()
+            response_body['category_form'] = category_form
+            articles = Article.objects.all()
+            response_body['articles'] = articles
+            print(repr(articles))
+            response_body['settings'] = 'True'
+            response_body['style'] =  {"template_pack": "rest_framework/inline/"}
+            print(repr(response_body))
+            return Response(response_body, template_name = "panel.html")
+        else:
+            return Response(template_name="panel.html")
+
     if request.method == 'POST':
-        if request.get_full_path() == '/panel/settings':
-            serializer = CategoryForm(request.POST)
+        if request.get_full_path() == '/panel/settings/':
+            serializer = CategoryForm(data=request.POST)
             if serializer.is_valid():
                 serializer.save()
                 serializer = CategoryForm()
                 success_message = "successfully added"
-                resp_body = {"settings": True, "serializer": serializer,
-                                "success_message" : success_message}
+                resp_body = {"settings": 'True', "category_form": serializer,
+                                "success_message" : '', "style": {"template_pack": "rest_framework/inline/"}}
             else:                
-                resp_body = {"settings": True, "serializer": serializer,
-                                "success_message" : success_message}
+                resp_body = {"settings": 'True', "category_form": serializer,
+                                "success_message" : '',  "style": {"template_pack": "rest_framework/inline/"}}
 
-            return Response(resp_body)
+            return Response(resp_body, template_name = 'panel.html')
 
         elif request.get_full_path() == '/panel/new_post/':
-            form = PostForm(data=request.data)
+            form = PostForm(request.POST, request.FILES)
             if form.is_valid():
-                post = ArticleSerializer(data=form.validated_data)
-                if post.is_valid():
-                    post = post.save(author = request.user) 
-                    article = Article.objects.first
-                    print("#$#$#$", post)
-                    for i in form.validated_data['categories']:
-                        ac = Article_Category(article= post, category = i)
-                        ac.save()
-                    
-                    return Response({'form': form, 'style': {}}, template_name='panel.html')
-                
-                if hasattr(form.validated_data, 'new_categories') and form.validated_data['new_categories'] != '':
-                      for cat in form.validated_data['new_categories'].split(','):
-                        new_cat = CategorySerializer(name=cat, slug = cat)
-                        if new_cat.is_valid():
-                            new_cat.save()
-                        try:
-                            post.save()
+                post = form.save(commit = False, author = request.user)
+                print(request.POST)
+                if form.is_valid() and post:
+                    post.save()
+                    print("cdata:", form.cleaned_data['categories'])
+                    if 'categories' in form.cleaned_data and form.cleaned_data['categories'] != '':
+                        for i in form.cleaned_data['categories']:
+                            print("cat", i)
 
-                        except IntegrityError as e:
-                            err = f"Category: {cat} exists."
-                            # only for test now, will use django-rest later
-                            print(err)              
-                            return Response({'form': form, 'style': {}}, template_name='panel.html')
- 
+                            ac = Article_Category(article = post, category = i)
+                            ac.save() 
+
+                    print("cdata:", form.cleaned_data['new_categories'])
+                    if 'new_categories' in form.cleaned_data and form.cleaned_data['new_categories'] != '':
+                        for cat in form.cleaned_data['new_categories'].split(','):
+                            new_cat = Category(name = cat, slug = slugify(cat))
+                            print("new_cat", new_cat)
+                            new_cat.save()
+                            ac = Article_Category(article = post, category = new_cat)
+                            ac.save()
+                            try:
+                                form.save(commit = True)
+
+                            except IntegrityError as e:
+                                err = f"Category: {cat} exists."
+                                # only for test now, will use django-rest later
+                                print(err)              
+                                return Response({'form': form, 'style': {}}, template_name='panel.html')
+                
+                form.save(commit=True)      
                 return redirect("/panel/new_post/success", content_type='application/json')
         # only for test now, will use django-rest later
             else:
@@ -138,21 +170,25 @@ class Panel(ModelViewSet):
     def put(self, request):
         pass
 
-    def delete(self, request, format=None):
-        if request.get_full_path() == '/delete/':
-            if request.is_ajax and request.method == "DELETE":
-                if 'json' in request.headers.get('Content-Type'):
-                    js = json.loads(request.body)
-                    article_slug = js['slug']
-                    print(article_slug)
-                    try:
-                        Article.objects.get(slug=article_slug).delete()
-                        return Response({'delete': 'success'})
-                    except Exception as e:
-                        return Response({'delete': 'fail'})
-                else:
-                    print('Response content is not in JSON format.')
-        
+    def delete(self, request):  
+        if True:
+            print(repr(request))
+            if 'json' in request.headers.get('Content-Type'):
+                js = json.loads(request.body)
+                article_slug = js['slug']
+                print(article_slug)
+                try:
+                    Article.objects.get(slug=article_slug).delete()
+                    return Response({'delete': 'success'})
+                except Exception as e:
+                    return Response({'delete': 'fail'})
+            else:
+                print('Response content is not in JSON format.') 
+        else:
+            print(request.get_full_path())
+            return Response({'delete': 'fail'})
+
+
     def post(self, request):
         if request.get_full_path() == '/panel/settings':
             serializer = CategoryForm(request.POST)
@@ -171,12 +207,12 @@ class Panel(ModelViewSet):
         elif request.get_full_path() == '/panel/new_post/':
             if request.POST:
                 form = PostForm(request.data)
-                print(form.validated_data, form.data)
+                print(form.cleaned_data, form.data)
                 if form.is_valid():
                     post = form
                     form.save(author = request.user)
                     try:
-                        print(form.validated_data)
+                        print(form.cleaned_data)
                         post.save()
                         #form.save_m2m() override create for PostForm to support many to many relationship
                     except Exception as e:
@@ -186,7 +222,7 @@ class Panel(ModelViewSet):
 
                     if form.cleaned_data['new_categories'] != '':
                         for cat in form.cleaned_data['new_categories'].split(','):
-                            new_cat = CategorySerializer(name=cat, slug = cat)
+                            new_cat = Category(name=cat, slug = slugify(cat))
                             new_cat.save()
                             try:
                                 post.save()
@@ -214,6 +250,10 @@ from .forms import CustomAuthForm
 class login(LoginView):
     template_name = 'login.html'
     form_class = CustomAuthForm
+
+@api_view(['GET'])
+def delete_view(request, slug):
+    return Response({"nothig": "nothing"}, template_name = 'index.html')
 
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])

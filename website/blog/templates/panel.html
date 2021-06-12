@@ -3,35 +3,82 @@
 <head>
  {% load static %}
 {% load rest_framework %}
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 {% csrf_token %}
 <script>
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 </script>
-
+<script type="text/javascript">     window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
 <script type="text/javascript">
-      $(document).ready(function() {
+/*      $(document).ready(function() {
         $(".del").click(function() {
             if (!confirm("Do you want to delete")){
                 return false;
             }
             else {
-                const request = new Request(
-                    "/delete",
-                    {headers: {"X-CSRFToken": csrftoken}}
-                    );
-
-                    return fetch(request, {
+                  
+           return fetch('/panel/posts/' + event.target.id, {
                         method: "DELETE",
-                        headers: new Headers({"content-type": "application/json",
+                       headers: new Headers({"content-type": "application/json",
         "X-Requested-With": "XMLHttpRequest",
    "X-CSRFToken": csrftoken }),
                         body: JSON.stringify({"slug": event.target.id}), }).then(response => response.json().then(
-                        data =>  ({"status": "200", body: data})))}
-                }
-        );
-            });
+                        data =>  ({"status": "200", body: data})))
+   
 
+}
+
+
+
+})})        
+*/
+$.ajaxSetup({
+  data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+});
+
+$(document).ready(function() {
+$('.del_article').on('click', function(){
+    let confirmation = confirm("are you sure you want to remove the item?");
+    if (confirmation) {
+        let object_id = event.target.id;
+        let url = `/panel/posts/${object_id}/`;
+        $.ajax({
+           url: url,
+    headers:{
+        "X-CSRFToken": '{{ csrf_token }}'
+         },
+        data: JSON.stringify({"slug" : object_id, "object_type": "article"}),
+           type: "DELETE",
+           contentType: "application/json"
+         }).done(
+              function(){alert("Deleted"); window.location.href = "/panel/settings/"}
+            ).fail(
+              function(){alert("Error");}
+            ) 
+}
+})
+$('.del_cat').on('click', function(){
+    let confirmation = confirm("are you sure you want to remove the item?");
+    if (confirmation) {
+        let object_id = event.target.id;
+        let url = `/panel/posts/${object_id}/`;
+        $.ajax({
+           url: url,
+    headers:{
+        "X-CSRFToken": '{{ csrf_token }}'
+         },
+        data: JSON.stringify({"slug" : object_id, "object_type" : "category"}),
+           type: "DELETE",
+           contentType: "application/json"
+         }).done(
+              function(){alert("Deleted"); window.location.href = "/panel/settings/"}
+            ).fail(
+              function(){alert("Error");}
+            ) 
+}
+})
+})
 
 </script>
 
@@ -40,6 +87,8 @@ jQuery(document).on( "keydown", ".normal", function(e){if (e.keyCode == 13) {ret
 </script>
 <script src="http://bootstrap-tagsinput.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script> 
   	<title>Sidebar 09</title>
+
+<link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css"/>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link rel="stylesheet" href="http://bootstrap-tagsinput.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.css">
@@ -50,9 +99,58 @@ jQuery(document).on( "keydown", ".normal", function(e){if (e.keyCode == 13) {ret
 		<link rel="stylesheet" href="{% static 'sidebar-09/css/style.css' %}">
 
 <style>
+
+element.style {
+}
+.mb-3, .my-3 {
+    /* margin-bottom: 1rem !important; */
+}
+.input-group {
+    align-items: baseline;
+}
+body {
+    margin: 0;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;
+    background-color: #fff;
+}
+.form-control {
+    display: block;
+    width: 100%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.normal, .bootstrap-tagsinput{
+    margin: 8px 0;
+}
+
+#postform {
+width: 0
+
+}
+
+#postform .submit {
+with:  1em;
+margin-left: auto;
+margin-right: auto;
+}
+
 .label-info {
     background-color: #5bc0de;
 }
+
 .label {
     display: inline;
     padding: .2em .6em .3em;
@@ -68,7 +166,7 @@ jQuery(document).on( "keydown", ".normal", function(e){if (e.keyCode == 13) {ret
 
 element.style {
 }
-.bootstrap-tagsinput .tag {
+.bootstrap-tagsinput, .tag {
     margin-right: 2px;
     color: white;
 }
@@ -101,8 +199,25 @@ select {
   box-sizing: border-box;
 
 }
+input[type=text].special {
+width: 30%;
+ padding: 4px 8px;
+ margin: 8px 0; 
+display: inline-block;
+ border: 1px solid #ccc; border-radius: 4px;
+ box-sizing: border-box; 
+}
 
-input[type=text].normal {
+#bootstrap-tagsinput{
+padding: 12px 20px;
+border: 1px solid #ccc;
+border-radius: 4px;
+box-sizing: border-box;
+margin: 8px 0;
+
+}
+
+input[type=text].normal, #id_categories {
   width: 100%;
   padding: 12px 20px;
   margin: 8px 0;
@@ -194,7 +309,7 @@ header, main, footer {
     	</nav>
 
         <!-- Page Content  -->
-      <div id="content" class="p-4 p-md-5 pt-5" name="content">
+      <div  class="p-4 p-md-5 pt-5" name="content">
     {% if settings %}
         <h2 class="mb-4">Settings</h2>
    {% endif %}
@@ -202,53 +317,81 @@ header, main, footer {
 
 {% if settings %}
 
+{% if articles %}
 <ul class="list-group">
   <li class="list-group-item">Articles</li>
 
-  
 
-  
-{% for a in articles %} 
+
+{% for article in articles %} 
+
   <li class="list-group-item list-group-item-primary">
-<a href = "#"> {{a.title}} </a>
 
+<a href = "#">{{ article.title }}</a>
 <div style="display:inline-block">
 <button href = "#" style="background-color: green;"> edit </button>
 
-<button id='{{a.slug}}' class="del"  style="background-color: red;">delete</button>
+<button id='{{ article.slug }}' class="del_article"  style="background-color: red;">delete</button>
 <span> status : published </span>
+</div>
+</li>
+
+{% endfor %}
+
+</ul>
+
+
+{% endif %}
+
+<div style="display:list-items">
+<form id="changeCatForm" action="" method="POST">
+{% csrf_token %}
+
+{% if categories %}
+<ul class="list-group">
+  
+<li class="list-group-item">Categories</li>
+{% for category in categories %} 
+
+  <li class="list-group-item  list-group-horizontal list-group-item-primary">
+
+<a href = "#">{{ category.name }}</a>
+<div style="display:inline-block; float:right;">
+<button href = "#" style="background-color: green;"> edit </button>
+
+<button id='{{ category.slug }}' class="del_cat"  style="background-color: red;">delete</button>
 </div>
 </li>
 {% endfor %}
 
 </ul>
 
-
-<div style="display:list-items">
-<form id="changeCatForm" action="" method="POST">
-{% csrf_token %}
-{% render_form form %}
-<h2 style="color:orange;">{{ category_form.errors }}</h2>
-
-{% if success_message %}
-<h2 style="color:green;"> {{ success_message }}  </h2>
 {% endif %}
 
-<ul class="list-group">
-<li class="list-group-item"> Add Category </li>
 
-  <li class="list-group-item list-group-item-secondary">
-{% render_field  category_form.name style=style %}
-</li>
-  <li class="list-group-item list-group-item-secondary">
 
-{% render_field  category_form.slug style=style %}
-</li>
+<div  class="input-group mb-3">
+ <div class="input-group-prepend" style="margin:0;">
+    <button class="btn btn-outline-secondary" type="submit">add category</button>
+  </div>
 
-<button type="submit" class="btn btn-lg btn-primary btn-block submit"> add category </button>
-</ul>
+{% for field in category_form %}
+  {% if not field.read_only %}
+<div class="normal" style="padding: 1px;"> {% render_field field style=style %} </div>
+{% endif %}
+{% endfor %}
+
+</div>
 </form>
 </div>
+
+
+
+
+
+
+
+
 {% endif %}
 
 {% if form %}	
@@ -265,6 +408,7 @@ header, main, footer {
 <div style="display:inline-block">
 
 {{form.categories}}
+
 {{form.new_categories}}
 
 <button type="submit" class="btn btn-lg btn-primary btn-block submit"> submit </button>

@@ -19,13 +19,6 @@ from .forms import CustomAuthForm
 from django.contrib.auth import views as auth_views
 from . import views
 
-#router.register(r'panel', views.panel.as_view(), basename = 'panel')
-#router.register(r'panel/new_post', views.panel.as_view(), basename = 'panel_new_post')
-#router.register(r'panel/new_post/success', views.panel, basename = 'panel_post_success')
-#router.register(r'panel/settings/', views.panel, basename = 'panel_settings')
-
-#router.register(r'panel/delete/', views.panel, basename = 'panel_delete_post')
-
 urlpatterns = [
     path(r'', views.index, name='home'),
     path(r'category/<slug:slug>', views.category_view, name='category'),
@@ -36,7 +29,5 @@ urlpatterns = [
     path(r'panel/new_post/success/', views.post_success, name='post_success'),
     path('login/', views.login.as_view(template_name='login.html'), name='login', kwargs={"authentication_form":CustomAuthForm}),
     path(r'panel/settings/', views.panel, name = 'panel_settings'),
-    path(r'panel/delete/', views.panel, name = 'panel_delete_post')
-
-
+    path(r'panel/posts/<slug:slug>/', views.panel, name = 'panel_post'),
 ]
