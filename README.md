@@ -13,11 +13,11 @@ A mini-CMS developed with Django(And will later Add django-rest).
 ### 
 Implemented serializers to develop API later.
 
-[screenshots](login.jpeg)
-[screenshots](panel.jpeg)
-[screenshots](panel2.jpeg)
-[screenshots](panel3.jpeg)
-[screenshots](post.jpeg)
+[login](screenshots/login.jpeg)
+[panel](screenshots/panel.jpeg)
+[panel](screenshots/panel2.jpeg)
+[panel](screenshots/panel3.jpeg)
+[panel](screenshots/post.jpeg)
 
 
 ###
