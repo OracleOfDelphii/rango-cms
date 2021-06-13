@@ -1,6 +1,8 @@
 {% extends "base_blog.html" %}
 
 
+{% block title %}    <title> {{category_name}} </title> {% endblock %}
+
 {% block menu_categories %}
 {% for c in categories %}
 

@@ -163,7 +163,7 @@ def delete_view(request, slug):
 def category_view(request, slug):
     category = Category.objects.get(slug = slug)
     articles = Article.objects.filter(categories__in = [category])
-    return Response({'articles': articles}, template_name='category.html')
+    return Response({'articles': articles, 'category_name' : category.name }, template_name='category.html')
 
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])

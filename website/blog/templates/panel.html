@@ -5,20 +5,18 @@
 {% load rest_framework %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-{% csrf_token %}
-<script>
-const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-</script>
-<script type="text/javascript">     window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
 <script type="text/javascript">
+
+jQuery(document).on( "keydown", ".normal", function(e){if (e.keyCode == 13) {return false;} });
+
 $(document).ready(function() {
-{% if form %}		
+{% if form %}       
 $("#{{form.slug.id_for_label}}").keyup(function () {
     this.value = this.value.replace(/ /g, "-");
 });
 {% endif %}
 
-{% if category_form %}		
+{% if category_form %}      
 $("#{{category_form.slug.id_for_label}}").keyup(function () {
     this.value = this.value.replace(/ /g, "-");
 });
@@ -67,228 +65,22 @@ $('.del_cat').on('click', function(){
 }
 })
 })
+  </script>
 
-</script>
 
-<script>
-jQuery(document).on( "keydown", ".normal", function(e){if (e.keyCode == 13) {return false;} });
-</script>
+{% csrf_token %}
+
 <script src="http://bootstrap-tagsinput.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script> 
-  	<title>Sidebar 09</title>
+<title>Rango CMS panel</title>
 
 <link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css"/>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link rel="stylesheet" href="http://bootstrap-tagsinput.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.css">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
-
-
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-		<link rel="stylesheet" href="{% static 'sidebar-09/css/style.css' %}">
-
-<style>
-
-
-/* do not group these rules */
-*::-webkit-input-placeholder {
-    /* color: lightgray; /*;
-}
-*:-moz-placeholder {
-    /* FF 4-18 */
-    /* color: lightgray; /*;
-    opacity: 1;
-}
-*::-moz-placeholder {
-    /* FF 19+ */
-    /* color: lightgray; /*;
-    opacity: 1;
-}
-*:-ms-input-placeholder {
-    /* IE 10+ */
-    /* color: lightgray; /*;
-}
-*::-ms-input-placeholder {
-    /* Microsoft Edge */
-    /* color: lightgray; /*;
-}
-*::placeholder {
-    /* modern browser */
-    /* color: lightgray; /*;
-}
-
-
-
-
-.mb-3, .my-3 {
-    /* margin-bottom: 1rem !important; */
-}
-
-.input-group {
-    align-items: baseline;
-}
-body {
-    margin: 0;
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
-    color: #212529;
-    text-align: left;
-    background-color: #fff;
-}
-.form-control {
-    display: block;
-    width: 100%;
-    padding: .375rem .75rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: #495057;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-}
-
-.normal, .bootstrap-tagsinput{
-    margin: 8px 0;
-}
-
-#postform {
-width: 0
-
-}
-
-#postform .submit {
-with:  1em;
-margin-left: auto;
-margin-right: auto;
-}
-
-.label-info {
-    background-color: #5bc0de;
-}
-
-.label {
-    display: inline;
-    padding: .2em .6em .3em;
-    font-size: 75%;
-    font-weight: 700;
-    line-height: 1;
-    color: #fff;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: baseline;
-    border-radius: .25em;
-}
-
-element.style {
-}
-.bootstrap-tagsinput, .tag {
-    margin-right: 2px;
-    color: white;
-}
-.label-info {
-    background-color: #5bc0de;
-}
-
-#postform {
-display: inline-grid;
-}
-select {
-  text-align-last: center;
-  width: fit-content;
-}
-
-.bootstrap-tagsinput{
-width: 30%;
-min-width: 100px;
-padding: 5px 8px;
-
-}
-
-select {
-  width: fit-content;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-
-}
-input[type=text].special {
-width: 30%;
- padding: 4px 8px;
- margin: 8px 0; 
-display: inline-block;
- border: 1px solid #ccc; border-radius: 4px;
- box-sizing: border-box; 
-}
-
-#bootstrap-tagsinput{
-padding: 12px 20px;
-border: 1px solid #ccc;
-border-radius: 4px;
-box-sizing: border-box;
-margin: 8px 0;
-
-}
-
-input[type=text].normal, #id_categories {
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-h1, h2, h3{
-margin-left: auto;
-margin-right: auto;
-}
-
-input[type=submit].normal{
-  width: 100%;
-  background-color: #04AA6D;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-
-
-input{box-sizing:border-box} 
-div{box-sizing:border-box} 
-
-.submit_button {
-background-color: darkgreen;
-min-height: 45px;
-}
-
-form{
-margin-left:auto;
-margin-right:auto;
-color: black;
-}
-/* Add a background color to the submit button on mouse-over */
-input[type=submit]:hover {
-  background-color: #45a049;
-} 
-
-header, main, footer {
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-
-</style>
+<link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="{% static 'sidebar-09/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/custom_panel.css' %}">
 </head>
 
 {% block content %}
