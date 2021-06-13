@@ -6,8 +6,20 @@ from django.db import  IntegrityError
 from ckeditor.fields import RichTextFormField
 
 class CategoryForm(forms.ModelForm):
-    name = forms.CharField(widget = forms.TextInput(attrs = {'class': 'form-control', 'placeholder': 'name'}), required=True, max_length=100) 
-    slug = forms.CharField(widget = forms.TextInput(attrs = {'class': 'form-control', 'placeholder': 'slug'}), required=True, max_length=100)
+    name = forms.CharField(widget = forms.TextInput(attrs = {'class': 'form-control', 'placeholder': 'name'}), required=False, max_length=100) 
+    slug = forms.CharField(widget = forms.TextInput(attrs = {'class': 'form-control', 'placeholder': 'slug'}), required=False, max_length=100)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name =  cleaned_data.get("name")        
+        slug = cleaned_data.get("slug")
+        if not (name):
+            raise ValidationError("Field name is required")
+        if not (slug):
+            raise ValidationError("Field slug is required")
+
+
+
     class Meta:
         model = Category
         fields = '__all__'

@@ -11,27 +11,21 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 </script>
 <script type="text/javascript">     window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
 <script type="text/javascript">
-/*      $(document).ready(function() {
-        $(".del").click(function() {
-            if (!confirm("Do you want to delete")){
-                return false;
-            }
-            else {
-                  
-           return fetch('/panel/posts/' + event.target.id, {
-                        method: "DELETE",
-                       headers: new Headers({"content-type": "application/json",
-        "X-Requested-With": "XMLHttpRequest",
-   "X-CSRFToken": csrftoken }),
-                        body: JSON.stringify({"slug": event.target.id}), }).then(response => response.json().then
-
-})})        
-*/
-$.ajaxSetup({
-  data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
-});
-
 $(document).ready(function() {
+{% if form %}		
+$("#{{form.slug.id_for_label}}").keyup(function () {
+    this.value = this.value.replace(/ /g, "-");
+});
+{% endif %}
+
+{% if category_form %}		
+$("#{{category_form.slug.id_for_label}}").keyup(function () {
+    this.value = this.value.replace(/ /g, "-");
+});
+{% endif %}
+
+
+
 $('.del_article').on('click', function(){
     let confirmation = confirm("are you sure you want to remove the item?");
     if (confirmation) {
@@ -94,11 +88,41 @@ jQuery(document).on( "keydown", ".normal", function(e){if (e.keyCode == 13) {ret
 
 <style>
 
-element.style {
+
+/* do not group these rules */
+*::-webkit-input-placeholder {
+    /* color: lightgray; /*;
 }
+*:-moz-placeholder {
+    /* FF 4-18 */
+    /* color: lightgray; /*;
+    opacity: 1;
+}
+*::-moz-placeholder {
+    /* FF 19+ */
+    /* color: lightgray; /*;
+    opacity: 1;
+}
+*:-ms-input-placeholder {
+    /* IE 10+ */
+    /* color: lightgray; /*;
+}
+*::-ms-input-placeholder {
+    /* Microsoft Edge */
+    /* color: lightgray; /*;
+}
+*::placeholder {
+    /* modern browser */
+    /* color: lightgray; /*;
+}
+
+
+
+
 .mb-3, .my-3 {
     /* margin-bottom: 1rem !important; */
 }
+
 .input-group {
     align-items: baseline;
 }
@@ -325,7 +349,7 @@ header, main, footer {
 <div style="display:inline-block">
 <button href = "#" style="background-color: green;"> edit </button>
 
-<button id='{{ article.slug }}' class="del_article"  style="background-color: red;">delete</button>
+<button id='{{ article.slug|slugify }}' class="del_article"  style="background-color: red;">delete</button>
 <span> status : published </span>
 </div>
 </li>
