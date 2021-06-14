@@ -174,7 +174,7 @@ def article_view(request, slug):
     except (ObjectDoesNotExist) as e:    
         return Response({'articles' : []}, status = status.HTTP_404_NOT_FOUND, template_name='article.html')
     if article.is_published == True and article.date <= timezone.now():
-        return Response({'article': article}, template_name='Article.html')
+        return Response({'article': article}, template_name='article.html')
 
     return Response({'articles' : []}, status = status.HTTP_404_NOT_FOUND, template_name='article.html')
 
