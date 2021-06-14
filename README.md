@@ -28,6 +28,8 @@ python -m venv venv
 ./venv/scripts/activate # or source for linux
 pip3 install -r requirements.txt
 cd website
+python manage.py makemigrations
+python manage.py migrate
 python manage.py runserver  # for deployment
 ```
 
