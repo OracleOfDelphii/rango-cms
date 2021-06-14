@@ -5,9 +5,9 @@
 {% load rest_framework %}
 
 <script type="text/javascript">
-
+$(document).ready(function () {
+  //your code here
 jQuery(document).on( "keydown", ".normal", function(e){if (e.keyCode == 13) {return false;} });
-
 {% if form %}       
 $("#{{form.slug.id_for_label}}").keyup(function () {
     this.value = this.value.replace(/ /g, "-").toLowerCase();
@@ -19,11 +19,6 @@ $("#{{category_form.slug.id_for_label}}").keyup(function () {
     this.value = this.value.replace(/ /g, "-").toLowerCase();
 });
 {% endif %}
-
-
-
-
-$(document).ready(function() {
 
 $('.del_article').on('click', function(){
     let confirmation = confirm("are you sure you want to remove the item?");
