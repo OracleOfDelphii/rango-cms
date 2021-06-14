@@ -24,7 +24,7 @@ from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from rest_framework import status
-
+from django.utils import timezone
 
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])
@@ -59,7 +59,8 @@ def panel(request, **kwargs):
                 try:
                     Article.objects.get(slug=article_slug).delete() 
                     return Response({"successful" : 'true'}, status = status.HTTP_200_OK, template_name='article.html')
-                except Exception as e: 
+                except Exception as e:
+                    print(e) 
                     return Response({"successful" : 'false'}, status = status.HTTP_200_OK, template_name='article.html')
             elif js['object_type'] == 'category':
                 category_slug = js['slug']
@@ -162,7 +163,7 @@ def delete_view(request, slug):
 @renderer_classes([TemplateHTMLRenderer])
 def category_view(request, slug):
     category = Category.objects.get(slug = slug)
-    articles = Article.objects.filter(categories__in = [category])
+    articles = Article.objects.filter(categories__in = [category], is_published = True, date__lte = timezone.now())
     return Response({'articles': articles, 'category_name' : category.name }, template_name='category.html')
 
 @api_view(['GET'])
@@ -172,10 +173,13 @@ def article_view(request, slug):
         article =  Article.objects.get(slug = slug)
     except (ObjectDoesNotExist) as e:    
         return Response({'articles' : []}, status = status.HTTP_404_NOT_FOUND, template_name='article.html')
-    return Response({'article': article}, template_name='Article.html')
+    if article.is_published == True and article.date <= timezone.now():
+        return Response({'article': article}, template_name='Article.html')
+
+    return Response({'articles' : []}, status = status.HTTP_404_NOT_FOUND, template_name='article.html')
 
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])
 def index(request):
-    articles = Article.objects.all()
+    articles = Article.objects.filter(is_published = True, date__lte = timezone.now())
     return Response({'articles': articles}, template_name = 'index.html')

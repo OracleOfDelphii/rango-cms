@@ -18,8 +18,8 @@ import os
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-CKEDITOR_BASEPATH = "/static_files/ckeditor/"
-CKEDITOR_UPLOAD_PATH = "/static_files/ckeditor/"
+CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
+CKEDITOR_UPLOAD_PATH = "/static/ckeditor/ckeditor/"
 LOGIN_REDIRECT_URL = 'panel'
 
 
@@ -48,9 +48,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'blog',
+'tempus_dominus',
     'ckeditor',
     'ckeditor_uploader',
-]
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

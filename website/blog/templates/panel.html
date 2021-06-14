@@ -3,8 +3,8 @@
 <head>
  {% load static %}
 {% load rest_framework %}
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+{{ form.media }}
 <script type="text/javascript">
 
 jQuery(document).on( "keydown", ".normal", function(e){if (e.keyCode == 13) {return false;} });
@@ -12,13 +12,13 @@ jQuery(document).on( "keydown", ".normal", function(e){if (e.keyCode == 13) {ret
 $(document).ready(function() {
 {% if form %}       
 $("#{{form.slug.id_for_label}}").keyup(function () {
-    this.value = this.value.replace(/ /g, "-");
+    this.value = this.value.replace(/ /g, "-").toLowerCase();
 });
 {% endif %}
 
 {% if category_form %}      
 $("#{{category_form.slug.id_for_label}}").keyup(function () {
-    this.value = this.value.replace(/ /g, "-");
+    this.value = this.value.replace(/ /g, "-").toLowerCase();
 });
 {% endif %}
 
@@ -70,17 +70,23 @@ $('.del_cat').on('click', function(){
 
 {% csrf_token %}
 
+
 <script src="http://bootstrap-tagsinput.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script> 
 <title>Rango CMS panel</title>
-
-<link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css"/>
+<link rel="stylesheet" href= "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link rel="stylesheet" href="http://bootstrap-tagsinput.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.css">
 <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+ <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css"/>    
 <link rel="stylesheet" href="{% static 'sidebar-09/css/style.css' %}">
+
 <link rel="stylesheet" href="{% static 'css/custom_panel.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/propeller.min.css' %}">
+<link rel="stylesheet" href="{% static 'datetimepicker/css/bootstrap-datetimepicker.css' %}">
+<link rel="stylesheet" href="{% static 'datetimepicker/css/pmd-datetimepicker.css' %}">
 </head>
 
 {% block content %}
@@ -92,7 +98,7 @@ $('.del_cat').on('click', function(){
 				<!--	<button type="button" id="sidebarCollapse" class="btn btn-primary">
 	        </button> -->
         </div>
-	  		<div class="img bg-wrap text-center py-4" style="background-image: url(images/bg_1.jpg);">
+	  		<div class="img bg-wrap text-center py-4">
 	  			<div class="user-logo">
 	  				<div class="img" style="background-image: url({% static 'images/rango.jpeg' %});"></div>
 	  				<h3>Rango CMS panel</h3>
@@ -142,7 +148,14 @@ $('.del_cat').on('click', function(){
 <button href = "#" style="background-color: green;"> edit </button>
 
 <button id='{{ article.slug|slugify }}' class="del_article"  style="background-color: red;">delete</button>
-<span> status : published </span>
+<span> status : 
+{% if article.is_published %}
+<b style = "color: darkgreen;">published</b>
+{% else %}
+<b style = "color: darkbrown;">Drafted</b>
+{% endif %}
+ for date : {{ article.date|date:"m/d/Y h:i a" }} </span>
+
 </div>
 </li>
 
@@ -169,7 +182,7 @@ $('.del_cat').on('click', function(){
 <div style="display:inline-block; float:right;">
 <button href = "#" style="background-color: green;"> edit </button>
 
-<button id='{{ category.slug }}' class="del_cat"  style="background-color: red;">delete</button>
+<button id='{{ category.slug|slugify}}' class="del_cat"  style="background-color: red;">delete</button>
 </div>
 </li>
 {% endfor %}
@@ -212,12 +225,23 @@ $('.del_cat').on('click', function(){
 {{form.title}}
 {{form.slug}}
 {{form.img}}
+<!--Default date and time picker -->
+<div class="form-group pmd-textfield pmd-textfield-floating-label">
+    <label class="control-label" for="datetimepicker-default">Select Date and Time</label>
+{{ form.date }}
+
+</div>
+
+
 {{form.content}}
 <div style="display:inline-block">
 
 {{form.categories}}
 
 {{form.new_categories}}
+
+{{ form.is_published }}
+
 
 <button type="submit" class="btn btn-lg btn-primary btn-block submit"> submit </button>
 </form>
@@ -230,17 +254,35 @@ $('.del_cat').on('click', function(){
 		</div>
 
 
-
-    <script src="{% static 'js/jquery.min.js' %}"></script>
-    <script src="{% static 'js/popper.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/main.js' %}"></script>
 {%if form %}
-{% load static %}
+
 <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
 <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+
+<!-- Popper JS -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+
+<!-- Bootstrap js -->
+<script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<script type="text/javascript" src={% static "dist/js/propeller.min.js" %}></script>
+
+<script type="text/javascript" src="{% static "datetimepicker/js/moment-with-locales.js" %}"></script>
+<script type="text/javascript" language="javascript" src={% static "datetimepicker/js/bootstrap-datetimepicker.js" %}></script>
+
+<script>
+    // Default date and time picker
+    $('#datetimepicker-default').datetimepicker();
+</script>
+ 
 {% endif %}
+
+
+
+
 {% endblock %}
-  
+
+
+
 </body>
 </html>

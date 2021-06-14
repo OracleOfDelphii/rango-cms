@@ -4,6 +4,7 @@ from ckeditor.fields import RichTextField
 from django.core.exceptions import ValidationError
 from django.db import  IntegrityError
 from ckeditor.fields import RichTextFormField
+from tempus_dominus.widgets import DatePicker, TimePicker, DateTimePicker
 
 class CategoryForm(forms.ModelForm):
     name = forms.CharField(widget = forms.TextInput(attrs = {'class': 'form-control', 'placeholder': 'name'}), required=False, max_length=100) 
@@ -28,21 +29,41 @@ from django.forms import ModelMultipleChoiceField
 
 
 class PostForm(forms.ModelForm):
-    title = forms.CharField(required = True, max_length = 100, widget = forms.TextInput(attrs = {'class': 'normal', 'placeholder' : 'title'}) )
+    title = forms.CharField(required = True, max_length = 100, widget = forms.TextInput(attrs = {'class': 'normal form-control', 'placeholder' : 'title'}) )
     content = RichTextField()
     categories = ModelMultipleChoiceField(queryset = Category.objects.all(), widget = forms.CheckboxSelectMultiple(attrs = {'class': 'normal list-unstyled'}), required = False)
     img = forms.ImageField(required=False, widget = forms.ClearableFileInput(attrs = {'class': 'normal', 'style': 'padding: 2em'}))
-    new_categories = forms.CharField(label='new categories', required=False, widget = forms.TextInput(attrs = {'data-role': 'tagsinput', 'class': 'special', 'placeholder' : 'new category + enter'}))
-    slug = forms.SlugField(widget = forms.TextInput(attrs = {'class': 'normal', 'placeholder' : 'slug' } ))
+    new_categories = forms.CharField(label='new categories', required=False, widget = forms.TextInput(attrs = {'data-role': 'tagsinput', 'class': 'form-control special', 'placeholder' : 'new category + enter'}))
+    slug = forms.SlugField(widget = forms.TextInput(attrs = {'class': 'normal form-control', 'placeholder' : 'slug' } ))
+    date = forms.DateTimeField(widget=DateTimePicker(
+        options={
+                'useCurrent': True,
+                'collapse': False,
+            },
+            attrs={
+                'append': 'fa fa-calendar',
+                'icon_toggle': True,
+            }
+        ),
+        input_formats=['%m/%d/%Y %I:%M %p']
+    )
+
     class Meta:
         model  = Article
-        fields = ('content','title','slug', 'img', 'categories', 'new_categories')
+        fields = ('content','title','slug', 'img', 'categories', 'new_categories', 'is_published', 'date')
         exclude = ('author',)
 
     def clean_img(self):
         data = self.cleaned_data['img']
         return data
 
+    def clean_date(self):
+        data = self.cleaned_data['date']
+        return data
+
+    def clean_is_published(self):
+        data = self.cleaned_data['is_published']
+        return data
 
     def clean_title(self):
         data = self.cleaned_data['title']
@@ -57,7 +78,7 @@ class PostForm(forms.ModelForm):
         return data
 
     def clean_slug(self):
-        data = self.cleaned_data['slug']
+        data = self.cleaned_data['slug'].lower()
         if data == None:
             raise ValidationError("Field slug is required")
         return data
@@ -84,11 +105,13 @@ class PostForm(forms.ModelForm):
     def save(self, commit=True,  **kwargs):
         try:
             self.title = self.cleaned_data['title'] 
-            self.slug = self.cleaned_data['slug']
+            self.slug = self.cleaned_data['slug'] # why lower() didn't work here?
             self.content = self.cleaned_data['content']
             self.categories = self.cleaned_data['categories']
             self.new_categories = self.cleaned_data['new_categories']
-            self.img = self.cleaned_data['img']    
+            self.img = self.cleaned_data['img']   
+            self.is_published = self.cleaned_data['is_published']
+            self.date = self.cleaned_data['date'] 
             article = super(PostForm, self).save(commit=False)
         # do custom stuff
 
