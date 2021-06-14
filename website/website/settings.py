@@ -22,7 +22,7 @@ CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 CKEDITOR_UPLOAD_PATH = "/static/ckeditor/ckeditor/"
 LOGIN_REDIRECT_URL = 'panel'
 
-
+TEMPUS_DOMINUS_INCLUDE_ASSETS = True
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
