@@ -13,7 +13,7 @@ A mini-CMS developed with Django framework.
 ### Technologies Used:
 - Django3.1.12 and Django rest 3.12.4
 - Ajax
-- HTML, CSS, Bootstrap
+- HTML, CSS, Bootstrap Bundle + colorlib Theme
 - Sqlite3
 - ckeditor
 - tempus-dominus
