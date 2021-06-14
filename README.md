@@ -5,10 +5,11 @@ A mini-CMS developed with Django framework.
 ## Current features:
 - Seperate adminstratoin Panel with nice Bootstrap powered UI
 - add/delete articles
-- A minimal ready to use template.
-## New features!
 - add/delete categories
-- nice Login UI with bootstrap
+- publish date for posts(you can send to future or past with this feature.)
+- draft/publish
+- A minimal ready to use template.
+
 
 ### Technologies Used:
 - Django3.1.12 and Django rest 3.12.4
