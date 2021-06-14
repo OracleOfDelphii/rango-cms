@@ -38,7 +38,7 @@ class PostForm(forms.ModelForm):
     date = forms.DateTimeField(widget=DateTimePicker(
         options={
                 'useCurrent': True,
-                'collapse': False,
+                'collapse': True,
             },
             attrs={
                 'append': 'fa fa-calendar',

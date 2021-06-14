@@ -1,9 +1,7 @@
 .idea/
 venv/
 VirtualEnv/
-media_root/
-static_root/
-website/static/
+website/media/
 website/website/__pycache__/
 website/blog/__pycache__/
 website/blog/migrations/

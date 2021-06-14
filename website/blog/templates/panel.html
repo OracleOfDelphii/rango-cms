@@ -3,13 +3,11 @@
 <head>
  {% load static %}
 {% load rest_framework %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-{{ form.media }}
+
 <script type="text/javascript">
 
 jQuery(document).on( "keydown", ".normal", function(e){if (e.keyCode == 13) {return false;} });
 
-$(document).ready(function() {
 {% if form %}       
 $("#{{form.slug.id_for_label}}").keyup(function () {
     this.value = this.value.replace(/ /g, "-").toLowerCase();
@@ -23,6 +21,9 @@ $("#{{category_form.slug.id_for_label}}").keyup(function () {
 {% endif %}
 
 
+
+
+$(document).ready(function() {
 
 $('.del_article').on('click', function(){
     let confirmation = confirm("are you sure you want to remove the item?");
@@ -93,8 +94,10 @@ $('.del_cat').on('click', function(){
 
     {# Include Bootstrap 4 and jQuery #}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    
+   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 
+{{ form.media }}
 
 </head>
 
@@ -236,7 +239,6 @@ $('.del_cat').on('click', function(){
 {{form.img}}
 <!--Default date and time picker -->
 {{ form.date }}
-
 
 {{form.content}}
 <div style="display:inline-block">
