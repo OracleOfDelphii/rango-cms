@@ -25,7 +25,7 @@ A mini-CMS developed with Django framework.
 -- clone --
 cd rango-cms
 python -m venv venv
-./venv/scripts/activate # or source for linux
+./venv/Scripts/activate # or source ./venv/bin/activate for linux
 pip3 install -r requirements.txt
 cd website
 python manage.py makemigrations
