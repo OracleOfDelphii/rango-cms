@@ -16,7 +16,7 @@ A mini-CMS developed with Django framework.
 - HTML, CSS, Bootstrap
 - Sqlite3
 - ckeditor
-- Dja
+- tempus-dominus
 
 #### TO-DO
 API(implemented serializers for now)
