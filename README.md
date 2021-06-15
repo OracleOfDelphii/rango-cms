@@ -3,7 +3,7 @@
 A mini-CMS developed with Django framework.
 
 ## Current features:
-- Seperate adminstratoin Panel with nice Bootstrap powered UI
+- Seperate adminstration Panel with nice Bootstrap powered UI
 - add/delete articles
 - add/delete categories
 - publish date for posts(you can send to future or past with this feature.)
@@ -14,7 +14,7 @@ A mini-CMS developed with Django framework.
 ### Technologies Used:
 - Django3.1.12 and Django rest 3.12.4
 - Ajax
-- HTML, CSS, Bootstrap Bundle + colorlib Theme
+- HTML, CSS, Bootstrap + colorlib Theme
 - Sqlite3
 - ckeditor
 - tempus-dominus
