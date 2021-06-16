@@ -1,5 +1,6 @@
+import json
 from django.shortcuts import render
-
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
 from .serializers import CategorySerializer, ArticleSerializer, Article_Category_Serializer
 from django.contrib.auth.views import LoginView
@@ -13,17 +14,14 @@ from django.db import IntegrityError
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from rest_framework import serializers
 from rest_framework.views import APIView
 from rest_framework.renderers import TemplateHTMLRenderer, StaticHTMLRenderer
 from django.contrib.auth import logout
 from rest_framework.viewsets import ModelViewSet
-import json
-from rest_framework import renderers
+from rest_framework import renderers, status, serializers
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
-from rest_framework import status
 from django.utils import timezone
 
 @api_view(['GET'])
@@ -43,15 +41,11 @@ def sign_out(request):
         rd = request.GET.get('next') 
         return redirect(rd)
 
-from django.db import transaction
-
 @login_required(login_url='login')
 @api_view(['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
 @renderer_classes([TemplateHTMLRenderer])
 def panel(request, **kwargs):
     if request.method == 'DELETE':
-        print(request.get_full_path())
-        print(kwargs)
         if 'json' in request.headers.get('Content-Type'):
             js = json.loads(request.body)
             if js['object_type'] == 'article':
@@ -94,19 +88,16 @@ def panel(request, **kwargs):
 
     if request.method == 'POST':
         if request.get_full_path() == '/panel/settings/':
-            serializer = CategoryForm(data=request.POST)
-            if serializer.is_valid():
-                serializer.save()
-                serializer = CategoryForm()
+            form = CategoryForm(request.POST)
+            if form.is_valid():
+                form.save(commit=True)
+                form = CategoryForm()
                 success_message = "successfully added"
-                resp_body = {"settings": 'True', "category_form": serializer,
-                                "success_message" : '', "style": {"template_pack": "rest_framework/inline/"}}
-            else:                
-                resp_body = {"settings": 'True', "category_form": serializer,
-                                "success_message" : '',  "style": {"template_pack": "rest_framework/inline/"}}
-
-            return Response(resp_body, template_name = 'panel.html')
-
+           
+                return render(request, 'panel.html', {'category_form': form}) 
+            else:               
+                return render(request, 'panel.html', {'category_form': form}) 
+        
         elif request.get_full_path() == '/panel/new_post/':
             form = PostForm(request.POST, request.FILES)
             if form.is_valid():
@@ -153,11 +144,6 @@ class login(LoginView):
     class Meta:
         fields = ['username', 'password', 'remember']
 
-from django.core.exceptions import ObjectDoesNotExist
-
-@api_view(['GET'])
-def delete_view(request, slug):
-    return Response({"nothig": "nothing"}, template_name = 'index.html')
 
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])

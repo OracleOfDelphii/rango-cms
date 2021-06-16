@@ -177,8 +177,11 @@ $('.del_cat').on('click', function(){
 {% csrf_token %}
 
 {% if categories %}
+<b style="color:red;">{{ category_form.errors }}</b>
+
 <ul class="list-group">
-  
+
+ 
 <li class="list-group-item">Categories</li>
 {% for category in categories %} 
 
