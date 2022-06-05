@@ -9,6 +9,7 @@
 $(document).ready(function () {
   //your code here
 jQuery(document).on( "keydown", ".normal", function(e){if (e.keyCode == 13) {return false;} });
+
 {% if form %}       
 $("#{{form.slug.id_for_label}}").keyup(function () {
     this.value = this.value.replace(/ /g, "-").toLowerCase();
@@ -21,31 +22,35 @@ $("#{{category_form.slug.id_for_label}}").keyup(function () {
 });
 {% endif %}
 
-$('.del_article').on('click', function(){
-    let confirmation = confirm("are you sure you want to remove the item?");
-    if (confirmation) {
+
+$('.edit_article').on('click', function(){
         let object_id = event.target.id;
-        let url = `/panel/posts/${object_id}/`;
+        let url = `/panel/edit_post/${object_id}/`;
         $.ajax({
            url: url,
     headers:{
         "X-CSRFToken": '{{ csrf_token }}'
          },
         data: JSON.stringify({"slug" : object_id, "object_type": "article"}),
-           type: "DELETE",
+           type: "PUT",
            contentType: "application/json"
          }).done(
-              function(){alert("Deleted"); window.location.href = "/panel/settings/"}
+              function(){  window.location.href = url}
             ).fail(
               function(){alert("Error");}
             ) 
-}
+
 })
+
+
+
+
+
 $('.del_cat').on('click', function(){
     let confirmation = confirm("are you sure you want to remove the item?");
     if (confirmation) {
         let object_id = event.target.id;
-        let url = `/panel/posts/${object_id}/`;
+        let url = `/panel/delete_category/${object_id}/`;
         $.ajax({
            url: url,
     headers:{
@@ -54,15 +59,13 @@ $('.del_cat').on('click', function(){
         data: JSON.stringify({"slug" : object_id, "object_type" : "category"}),
            type: "DELETE",
            contentType: "application/json"
-         }).done(
-              function(){alert("Deleted"); window.location.href = "/panel/settings/"}
-            ).fail(
-              function(){alert("Error");}
-            ) 
+         }) 
 }
-})
-})
-  </script>
+});
+ 
+});
+
+</script>
 
 
 {% csrf_token %}
@@ -137,8 +140,7 @@ $('.del_cat').on('click', function(){
    {% endif %}
   
 
-{% if settings %}
-
+ 
 {% if articles %}
 <ul class="list-group">
   <li class="list-group-item">Articles</li>
@@ -151,9 +153,9 @@ $('.del_cat').on('click', function(){
 
 <a href = "#">{{ article.title }}</a>
 <div style="display:inline-block">
-<button href = "#" style="background-color: green;"> edit </button>
+<button id='{{ article.slug|slugify }}' class="edit_article" href = "#" style="background-color: green;"> edit </button>
 
-<button id='{{ article.slug|slugify }}' class="del_article"  style="background-color: red;">delete</button>
+<a href='/panel/delete_post/{{ article.slug|slugify }}'    ><button   style="background-color: red;"> delete </button></a>
 <span> status : 
 {% if article.is_published %}
 <b style = "color: darkgreen;">published</b>
@@ -201,7 +203,7 @@ $('.del_cat').on('click', function(){
 {% endif %}
 
 
-
+{% if categories %}
 <div  class="input-group mb-3">
  <div class="input-group-prepend" style="margin:0;">
     <button class="btn btn-outline-secondary" type="submit">add category</button>
@@ -210,6 +212,7 @@ $('.del_cat').on('click', function(){
 <div class="normal" style="padding: 1px;"> {{ category_form.name }} </div>
 <div class="normal" style="padding: 1px;">  {{ category_form.slug }} </div>
 </div>
+{% endif %}
 </form>
 </div>
 
@@ -220,7 +223,7 @@ $('.del_cat').on('click', function(){
 
 
 
-{% endif %}
+ 
 
 {% if form %}	
 	<div style="display:list-items">
@@ -244,6 +247,7 @@ $('.del_cat').on('click', function(){
 
 {{form.new_categories}}
 
+{{ form.author }}
 <label style="padding: 1em;"> <b>publish</b> {{ form.is_published }} </label>
 <button type="submit" class="btn btn-lg btn-primary btn-block submit"> submit </button>
 </form>
