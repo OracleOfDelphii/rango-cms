@@ -4,6 +4,6 @@ django-allauth==0.33.0
 django-classy-tags==2.0.0
 django-cors-headers==3.7.0
 django_ckeditor==6.1.0
-Pillow==9.0.0
+Pillow==9.0.1
 django-tempus-dominus==5.1.2.16
 psycopg2==2.9
