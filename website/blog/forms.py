@@ -1,12 +1,9 @@
-import imp
 from pipes import Template
 from django import forms
 from .models import Article, Category
 from ckeditor.fields import RichTextField
 from django.core.exceptions import ValidationError
-from django.db import  IntegrityError
-from ckeditor.fields import RichTextFormField
-from tempus_dominus.widgets import DatePicker, TimePicker, DateTimePicker
+from tempus_dominus.widgets import DateTimePicker
 
 class CategoryForm(forms.ModelForm):
     name = forms.CharField(widget = forms.TextInput(attrs = {'class': 'form-control', 'placeholder': 'name'}), required=False, max_length=100) 

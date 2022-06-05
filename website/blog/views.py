@@ -37,8 +37,8 @@ class NewPostView(CreateView):
     success_url ="/success/" # posts list url
 
     def form_valid(self, form):
-        article = form.save(commit=False)
-        article.save()
+        form.save(commit=False)
+        article = form.save()
         for category in form.cleaned_data.get('new_categories').split(','):
             try:
                 new_cat = Category.objects.get_or_create(name=category, slug=slugify(category))[0]
@@ -46,8 +46,8 @@ class NewPostView(CreateView):
             except (IntegrityError,ValueError) as e:
                 print(e)
                 
-        form.save_m2m()
-        
+     
+        form.cleaned_data['categories'] = article.categories.all()
         return super().form_valid(form)
 
  
