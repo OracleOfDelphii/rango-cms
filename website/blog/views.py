@@ -1,171 +1,131 @@
-import json
-from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
-from .serializers import CategorySerializer, ArticleSerializer, Article_Category_Serializer
 from django.contrib.auth.views import LoginView
-from .forms import CustomAuthForm
-from django.shortcuts import redirect
-from .models import  Category, Article, Article_Category
-from django.contrib.auth.models import User
-from django import forms
-from .forms import PostForm, CategoryForm, CustomAuthForm
-from django.db import IntegrityError
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
-from rest_framework.views import APIView
-from rest_framework.renderers import TemplateHTMLRenderer, StaticHTMLRenderer
-from django.contrib.auth import logout
-from rest_framework.viewsets import ModelViewSet
-from rest_framework import renderers, status, serializers
-from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
-from rest_framework.decorators import api_view, renderer_classes
-from rest_framework.response import Response
+from django.db.utils import IntegrityError
+from django.shortcuts import redirect 
+from .models import  Category, Article
+from .forms import PostForm
+from django.contrib.auth.views import LoginView    
 from django.utils import timezone
+from django.views.generic.base import TemplateView
+from django.urls import reverse_lazy
+from django.views.generic.edit import DeleteView
 
-@api_view(['GET'])
-@renderer_classes([TemplateHTMLRenderer])
-@login_required(login_url='login')
-def post_success(request):
-    if request.method == "GET":
-        return Response(template_name =  "post_success.html")
+class Panel(TemplateView):
+    
+    template_name = 'panel.html'
+    
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['articles'] = Article.objects.all()
+        context['categories'] = Category.objects.all()
+        return context
+    
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        return super().get(request, *args, **kwargs)
 
-@login_required(login_url='login', redirect_field_name=None)
-def sign_out(request):
-    if request.user.is_authenticated:
-        logout(request)
-        form = CustomAuthForm()
-        return redirect('/login')
-    else:
-        rd = request.GET.get('next') 
-        return redirect(rd)
+from django.views.generic.edit import  CreateView, UpdateView, DeleteView
 
-@login_required(login_url='login')
-@api_view(['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
-@renderer_classes([TemplateHTMLRenderer])
-def panel(request, **kwargs):
-    if request.method == 'DELETE':
-        if 'json' in request.headers.get('Content-Type'):
-            js = json.loads(request.body)
-            if js['object_type'] == 'article':
-                article_slug = js['slug']
-                try:
-                    Article.objects.get(slug=article_slug).delete() 
-                    return Response({"successful" : 'true'}, status = status.HTTP_200_OK, template_name='article.html')
-                except Exception as e:
-                    print(e) 
-                    return Response({"successful" : 'false'}, status = status.HTTP_200_OK, template_name='article.html')
-            elif js['object_type'] == 'category':
-                category_slug = js['slug']
-                try:
-                    Category.objects.get(slug=category_slug).delete() 
-                    return Response({"successful" : 'true'}, status = status.HTTP_200_OK, template_name='article.html')
-                except Exception as e: 
-                    return Response({"successful" : 'false'}, status = status.HTTP_200_OK, template_name='article.html')
-        else:
-            print(request.headers.get('Content-Type'))
-            print('Response content is not in JSON format.')
-
-    if request.method == 'GET': 
-        if request.get_full_path() == '/panel/new_post/':
-            form = PostForm()
-            return render(request, 'panel.html',  {'form': form})
-
-        elif request.get_full_path() == '/panel/settings/':
-            response_body = {}
-            category_form = CategoryForm()
-            response_body['category_form'] = category_form
-            articles = Article.objects.all()
-            response_body['articles'] = articles
-            print(repr(articles))
-            response_body['settings'] = 'True'
-            response_body['style'] =  {"template_pack": "rest_framework/inline/"}
-            print(repr(response_body))
-            return Response(response_body, template_name = "panel.html")
-        else:
-            return Response(template_name="panel.html")
-
-    if request.method == 'POST':
-        if request.get_full_path() == '/panel/settings/':
-            form = CategoryForm(request.POST)
-            if form.is_valid():
-                form.save(commit=True)
-                form = CategoryForm()
-                success_message = "successfully added"
-           
-                return render(request, 'panel.html', {'category_form': form}) 
-            else:               
-                return render(request, 'panel.html', {'category_form': form}) 
-        
-        elif request.get_full_path() == '/panel/new_post/':
-            form = PostForm(request.POST, request.FILES)
-            if form.is_valid():
-                with transaction.atomic():
-                    post = form.save(commit = False, author = request.user)
-                    print(request.POST)
-                    if form.is_valid():
-                        post.save()
-                        if 'categories' in form.cleaned_data and form.cleaned_data['categories'] != '':
-                            for category in form.cleaned_data['categories']:
-                                ac = Article_Category(article = post, category = category)
-                                ac.save()
-                        if 'new_categories' in form.cleaned_data and form.cleaned_data['new_categories'] != '':
-                            for cat in form.cleaned_data['new_categories'].split(','):
-                                try:
-                                    new_cat = Category(name = cat, slug = slugify(cat))
-                                    new_cat.save()
-                                    ac = Article_Category(article = post, category = new_cat)
-                                    ac.save()
-                                    form.save(commit = True)
-                                except (IntegrityError, ValueError) as e:  
-                                    return Response({'form': form, 'style': {}, "error" : "invalid category entry"}, template_name='panel.html')
-
-
-                    form.save(commit=True)
-                    return redirect("/panel/new_post/success", content_type='application/json')
-            
-            else:
-                return Response({'form': form, 'style': {}}, template_name='panel.html')
-
-class login(LoginView):
-    template_name = 'login.html'
-    form_class = CustomAuthForm
-    remember = forms.BooleanField(required = False)
+class NewPostView(CreateView):
+    template_name = 'panel.html'
+    form_class = PostForm
+    context_object_name = 'form'
+    model =  Article
+    success_url ="/success/" # posts list url
 
     def form_valid(self, form):
+        article = form.save(commit=False)
+        article.save()
+        for category in form.cleaned_data.get('new_categories').split(','):
+            try:
+                new_cat = Category.objects.get_or_create(name=category, slug=slugify(category))[0]
+                article.categories.add(new_cat)
+            except (IntegrityError,ValueError) as e:
+                print(e)
+                
+        form.save_m2m()
+        
+        return super().form_valid(form)
 
-        remember_me = form.cleaned_data['remember']  # get remember me data from cleaned_data of form
-        if not remember_me:
-            self.request.session.set_expiry(0)  # if remember me is 
-            self.request.session.modified = True
-        return super(login, self).form_valid(form)
-   
-    class Meta:
-        fields = ['username', 'password', 'remember']
+ 
+    
+class SuccessView(TemplateView):
+    template_name = 'post_success.html'
+    
 
+class EditPostView(UpdateView):
+    form_class = PostForm
+    template_name = 'panel.html'
+    context_object_name = 'form'
+    model = Article
+    success_url = r'/success/'
+ 
 
-@api_view(['GET'])
-@renderer_classes([TemplateHTMLRenderer])
-def category_view(request, slug):
-    category = Category.objects.get(slug = slug)
-    articles = Article.objects.filter(categories__in = [category], is_published = True, date__lte = timezone.now())
-    return Response({'articles': articles, 'category_name' : category.name }, template_name='category.html')
+class ListArticles(TemplateView):
+    template_name = 'panel.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['articles'] = Article.objects.all()
+        return context
+      
+class ListCategories(TemplateView):
+    template_name = 'panel.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        return context 
 
-@api_view(['GET'])
-@renderer_classes([TemplateHTMLRenderer])
-def article_view(request, slug):
-    try:
-        article =  Article.objects.get(slug = slug)
-    except (ObjectDoesNotExist) as e:    
-        return Response({'articles' : []}, status = status.HTTP_404_NOT_FOUND, template_name='article.html')
-    if article.is_published == True and article.date <= timezone.now():
-        return Response({'article': article}, template_name='article.html')
+class DeletePostView(DeleteView):
+    model = Article
+    template_name='article_confirm_delete.html'
+    success_url = reverse_lazy('posts')
+    
 
-    return Response({'articles' : []}, status = status.HTTP_404_NOT_FOUND, template_name='article.html')
+class IndexView(TemplateView):
+    template_name = 'index.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['articles'] = Article.objects.filter(date__lte=timezone.now(), is_published=True).order_by('-date')
+        context['categories'] = Category.objects.all()
+        return context
+    
+class ViewArticles(TemplateView):
+    template_name = 'articles.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.kwargs.get('category_slug'):
+            try:
+                category = Category.objects.get(slug=self.kwargs.get('category_slug'))
+                
+                print(timezone.now())
+                context['articles'] = Article.objects.filter(categories__in=[category], date__lte=timezone.now(), is_published=True).order_by('-date')
+                
+                context['categories'] = Category.objects.all()
+                
+            except ObjectDoesNotExist:
+                context['articles'] = Article.objects.all()
+ 
+        context['categories'] = Category.objects.all()
+        
+        
+        return context
+    
+    
+class ViewArticle(TemplateView):
+    template_name = 'article.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['article'] = Article.objects.get(slug=self.kwargs.get('article_slug'), date__lte=timezone.now(), is_published=True)
+        context['categories'] = Category.objects.all()
+        
+        
+        return context
 
-@api_view(['GET'])
-@renderer_classes([TemplateHTMLRenderer])
-def index(request):
-    articles = Article.objects.filter(is_published = True, date__lte = timezone.now())
-    return Response({'articles': articles}, template_name = 'index.html')
+class Login(LoginView):
+    template_name = 'login.html'

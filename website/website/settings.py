@@ -20,7 +20,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 CKEDITOR_UPLOAD_PATH = "/static/ckeditor/ckeditor/"
-LOGIN_REDIRECT_URL = 'panel'
+LOGIN_REDIRECT_URL = 'panel_home'
 
 TEMPUS_DOMINUS_INCLUDE_ASSETS = True
 
@@ -83,8 +83,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'blog.context_processors.categories',
-                'blog.context_processors.articles',
+ 
                 'django.template.context_processors.media',
             ],
         },
@@ -108,8 +107,8 @@ else:
             'postgres': {
                 'ENGINE': 'django.db.backends.postgresql',
                 'NAME': BASE_DIR / 'db.sql',
-
-
+                }
+            }
 
 
 # Password validation

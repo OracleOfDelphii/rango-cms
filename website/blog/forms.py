@@ -1,3 +1,5 @@
+import imp
+from pipes import Template
 from django import forms
 from .models import Article, Category
 from ckeditor.fields import RichTextField
@@ -27,8 +29,10 @@ class CategoryForm(forms.ModelForm):
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from django.forms import ModelMultipleChoiceField
 
+from django.contrib.auth.models import User
 
 class PostForm(forms.ModelForm):
+    author = forms.ModelChoiceField(queryset=User.objects.all(), required=True)
     title = forms.CharField(required = True, max_length = 100, widget = forms.TextInput(attrs = {'class': 'normal form-control', 'placeholder' : 'title'}) )
     content = RichTextField()
     categories = ModelMultipleChoiceField(queryset = Category.objects.all(), widget = forms.CheckboxSelectMultiple(attrs = {'class': 'normal list-unstyled'}), required = False)
@@ -50,8 +54,8 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model  = Article
-        fields = ('content','title','slug', 'img', 'categories', 'new_categories', 'is_published', 'date')
-        exclude = ('author',)
+        fields = ('author','content','title','slug', 'img', 'categories', 'new_categories', 'is_published', 'date')
+   
 
     def clean_img(self):
         data = self.cleaned_data['img']
@@ -101,35 +105,4 @@ class PostForm(forms.ModelForm):
         categories = cleaned_data.get("categories")
         if not (categories or new_categories):
             raise ValidationError("either add a new category or choose from categories")
-
-    def save(self, commit=True,  **kwargs):
-        try:
-            self.title = self.cleaned_data['title'] 
-            self.slug = self.cleaned_data['slug'] # why lower() didn't work here?
-            self.content = self.cleaned_data['content']
-            self.categories = self.cleaned_data['categories']
-            self.new_categories = self.cleaned_data['new_categories']
-            self.img = self.cleaned_data['img']   
-            self.is_published = self.cleaned_data['is_published']
-            self.date = self.cleaned_data['date'] 
-            article = super(PostForm, self).save(commit=False)
-        # do custom stuff
-
-            if 'author' in kwargs:
-                article.author = kwargs['author']
-        # change here later
-            if commit:
-                return article.save()
-        except Exception as ex:
-            print(ex)
-            return None
-        return article
-
-
-from django.contrib.auth.forms import AuthenticationForm
-from django.forms.widgets import PasswordInput, TextInput
-from django.forms import CheckboxInput
-class CustomAuthForm(AuthenticationForm):
-    username = forms.CharField(required=True, widget=TextInput(attrs={'placeholder': 'username', 'class': 'form-control'}))
-    password = forms.CharField(required=True, widget=PasswordInput(attrs={'placeholder':'Password', 'class': 'form-control'}))
-    remember = forms.BooleanField(required = False, label = "Remember me")
+        return cleaned_data
