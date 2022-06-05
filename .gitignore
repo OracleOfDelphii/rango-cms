@@ -1,8 +1,9 @@
 .idea/
-venv/
+env/
 VirtualEnv/
 website/media/
 website/website/__pycache__/
 website/blog/__pycache__/
 website/blog/migrations/
 website/db.sqlite3
+.vscode/
